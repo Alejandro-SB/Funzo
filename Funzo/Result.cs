@@ -7,7 +7,7 @@ namespace Funzo;
 /// </summary>
 /// <typeparam name="TOk">The type of the result if successful</typeparam>
 /// <typeparam name="TErr">The type of the result if an error occurs</typeparam>
-public class Result<TOk, TErr> : IEquatable<Result<TOk, TErr>>
+public class Result<TOk, TErr> : IEquatable<Result<TOk, TErr>>, IResult<Result<TOk, TErr>, TOk, TErr>
 {
     private readonly bool _isOk;
     private readonly TOk? _ok;
