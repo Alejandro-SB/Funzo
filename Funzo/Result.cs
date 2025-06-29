@@ -7,11 +7,11 @@
 /// <typeparam name="TErr">The type of the result if an error occurs</typeparam>
 public sealed class Result<TOk, TErr> : ResultBase<Result<TOk, TErr>, TOk, TErr>, IEquatable<Result<TOk, TErr>>
 {
-    protected Result(TOk ok) : base(ok)
+    private Result(TOk ok) : base(ok)
     {
     }
 
-    protected Result(TErr err) : base(err)
+    private Result(TErr err) : base(err)
     {
     }
 
@@ -57,12 +57,12 @@ public sealed class Result<TOk, TErr> : ResultBase<Result<TOk, TErr>, TOk, TErr>
 public sealed class Result<TErr> : ResultBase<Result<TErr>, TErr>
 {
     /// <inheritdoc />
-    protected Result()
+    private Result() : base()
     {
     }
 
     /// <inheritdoc />
-    protected Result(TErr err) : base(err)
+    private Result(TErr err) : base(err)
     {
     }
 
