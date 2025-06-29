@@ -1,9 +1,23 @@
 ﻿namespace Funzo;
-public interface IResult<out TResult, in TOk, in TErr>
-    where TResult : IResult<TResult, TOk, TErr>
+
+public interface IResult<TOk, TErr>
 {
-#if NET6_0_OR_GREATER
-    static abstract TResult Ok(TOk ok);
-    static abstract TResult Err(TErr err);
-#endif
 }
+public interface IResult<TErr>
+{
+}
+
+#if NET6_0_OR_GREATER
+public interface IResultBase<TResult, TOk, TErr>
+{
+    public static abstract TResult Ok(TOk ok);
+    public static abstract TResult Err(TErr ok);
+}
+
+public interface IResultBase<TResult, TErr>
+{
+    public static abstract TResult Ok();
+    public static abstract TResult Err(TErr ok);
+}
+
+#endif

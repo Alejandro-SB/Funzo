@@ -14,8 +14,8 @@ internal static class FunzoDiagnosticDescriptors
                 true);
 
         public static DiagnosticDescriptor WrongBaseType
-            => new("FNZ0002", "Result must inherit from Result",
-                "Class '{0}' should inherit from Result",
+            => new("FNZ0002", "Result must be marked with interface IResult",
+                "Class '{0}' should be marked with IResult",
                 "ResultGenerator",
                 DiagnosticSeverity.Error,
                 true);

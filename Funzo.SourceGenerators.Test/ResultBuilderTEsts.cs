@@ -59,10 +59,10 @@ public class ResultBuilderTEsts
 
 
 [Result]
-public partial class MyResult : Result<MyError>;
+public partial class MyResult : IResult<MyError>;
 
 [Result]
-public partial class MyCustomResult : Result<string, MyError>;
+public partial class MyCustomResult : IResult<string, MyError>;
 
 [Union]
 public partial class MyError : Union<ArgumentError, InvalidError, UnknownError>;

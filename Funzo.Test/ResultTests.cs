@@ -115,32 +115,30 @@ public class ResultTests
     }
 
     [Fact]
-    public async Task Inspect_Is_Called_Async_When_Result_Is_Ok()
+    public void Inspect_Is_Called_Async_When_Result_Is_Ok()
     {
         var result = Result<string, string>.Ok("TEST STRING");
 
         var test = "TEST";
 
-        await result.Inspect(_ =>
+        result.Inspect(_ =>
         {
             test = null;
-            return Task.CompletedTask;
         });
 
         Assert.Null(test);
     }
 
     [Fact]
-    public async Task Inspect_Is_Not_Called_Async_When_Result_Is_Err()
+    public void Inspect_Is_Not_Called_Async_When_Result_Is_Err()
     {
         var result = Result<string, string>.Err("");
 
         var test = "TEST";
 
-        await result.Inspect(_ =>
+        result.Inspect(_ =>
         {
             test = null;
-            return Task.CompletedTask;
         });
 
         Assert.NotNull(test);
