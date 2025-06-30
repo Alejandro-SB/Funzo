@@ -6,7 +6,7 @@ namespace Funzo;
 /// Represents a variable of type <typeparamref name="T"/> that may have no value
 /// </summary>
 /// <typeparam name="T">The type of the internal value</typeparam>
-public sealed class Option<T> : IEquatable<Option<T>>
+public readonly struct Option<T> : IEquatable<Option<T>>
 {
     /// <summary>
     /// If true, a value has been supplied
@@ -22,12 +22,6 @@ public sealed class Option<T> : IEquatable<Option<T>>
     {
         _value = value ?? throw new ArgumentNullException(nameof(value));
         _hasValue = true;
-    }
-
-    private Option() 
-    {
-        _value = default;
-        _hasValue = false;
     }
 
     /// <summary>
@@ -167,13 +161,8 @@ public sealed class Option<T> : IEquatable<Option<T>>
         => obj is Option<T> option && option.Equals(this);
 
     /// <inheritdoc/>
-    public bool Equals(Option<T>? other)
+    public bool Equals(Option<T> other)
     {
-        if (other is null)
-        {
-            return false;
-        }
-
         if (!_hasValue && !other._hasValue)
         {
             return true;
