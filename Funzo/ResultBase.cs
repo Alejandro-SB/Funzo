@@ -9,9 +9,9 @@ namespace Funzo;
 public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>
     where TResult : ResultBase<TResult, TOk, TErr>
 {
-    protected readonly bool IsOk;
-    protected readonly TOk? OkValue;
-    protected readonly TErr? ErrValue;
+    private protected readonly bool IsOk;
+    private protected readonly TOk? OkValue;
+    private protected readonly TErr? ErrValue;
 
     /// <summary>
     /// Creates a new instance of the <see cref="Result{TOk, TErr}"/> class as an OK result

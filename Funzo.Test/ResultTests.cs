@@ -1,8 +1,9 @@
 ﻿using Funzo;
+using System;
 using System.Text.Json;
 
 namespace Funzo.Test;
-public class ResultTests
+public class Result2ArityTests
 {
     [Fact]
     public void Ok_Creates_A_Successful_Operation_Result()
@@ -144,6 +145,15 @@ public class ResultTests
         Assert.NotNull(test);
     }
 
+    private static int OkOperation(int value) => value + 1;
+    private static int ErrOperation(int value) => value - 1;
+    private static void Pass<T>(T _) { }
+    private static Action<T> Throw<T>(string message) => (_) => throw new Exception(message);
+
+}
+
+public class Result1ArityTests
+{
     [Fact]
     public void Result_Can_Be_Constructed_Only_With_Err_Parameter()
     {
@@ -153,10 +163,4 @@ public class ResultTests
         Assert.False(okResult.IsErr(out _));
         Assert.True(errResult.IsErr(out _));
     }
-
-    private static int OkOperation(int value) => value + 1;
-    private static int ErrOperation(int value) => value - 1;
-    private static void Pass<T>(T _) { }
-    private static Action<T> Throw<T>(string message) => (_) => throw new Exception(message);
-
 }

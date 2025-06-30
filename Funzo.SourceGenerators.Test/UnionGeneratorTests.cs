@@ -1,4 +1,6 @@
-﻿namespace Funzo.SourceGenerators.Test;
+﻿using System;
+
+namespace Funzo.SourceGenerators.Test;
 public class UnionGeneratorTests
 {
     [Fact]

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Funzo;
-
-#if NET6_0_OR_GREATER
 
 public class ResultBuilder<TResult, TOk, TErr> : IResultBuilder<TResult, TOk, TErr>
     where TResult : IResultBase<TResult, TOk, TErr>
@@ -32,62 +31,22 @@ public class ResultBuilder<TResult, TOk, TErr> : IResultBuilder<TResult, TOk, TE
 
     public TResult Try(Func<TResult> action)
     {
-        try
-        {
-            return action();
-        }
-        catch (Exception e)
-        {
-            var exceptionType = e.GetType();
-
-            foreach (var pair in _maps)
-            {
-                var type = pair.Key;
-                var map = pair.Value;
-
-                if (exceptionType == type)
-                {
-                    return TResult.Err(map(e));
-                }
-            }
-
-            if(_else is { })
-            {
-                return TResult.Err(_else(e));
-            }
-
-            throw;
-        }
+        return BuilderHelpers.Try(action, _maps, _else, Producer);
     }
 
     public async Task<TResult> TryAsync(Func<Task<TResult>> action)
     {
-        try
-        {
-            return await action();
-        }
-        catch (Exception e)
-        {
-            var exceptionType = e.GetType();
+        return await BuilderHelpers.TryAsync(action, _maps, _else, Producer);
+    }
 
-            foreach (var pair in _maps)
-            {
-                var type = pair.Key;
-                var map = pair.Value;
-
-                if (exceptionType == type)
-                {
-                    return TResult.Err(map(e));
-                }
-            }
-
-            if (_else is { })
-            {
-                return TResult.Err(_else(e));
-            }
-
-            throw;
-        }
+    private TResult Producer(TErr err)
+    {
+#if NET6_0_OR_GREATER
+            return TResult.Err(err);
+#else
+        var staticErr = typeof(TResult).GetMethod("Err", BindingFlags.Static | BindingFlags.Public);
+        return (TResult)staticErr.Invoke(null, new object[] { err! });
+#endif
     }
 }
 
@@ -116,35 +75,47 @@ public class ResultBuilder<TResult, TErr> : IResultBuilder<TResult, TErr>
 
     public TResult Try(Func<TResult> action)
     {
+        return BuilderHelpers.Try(action, _maps, _else, Producer);
+    }
+
+    public async Task<TResult> TryAsync(Func<Task<TResult>> action)
+    {
+        return await BuilderHelpers.TryAsync(action, _maps, _else, Producer);
+    }
+
+    private TResult Producer(TErr err)
+    {
+#if NET6_0_OR_GREATER
+            return TResult.Err(err);
+#else
+        var staticErr = typeof(TResult).GetMethod("Err", BindingFlags.Static | BindingFlags.Public);
+        return (TResult)staticErr.Invoke(null, new object[] { err! });
+#endif
+    }
+}
+
+internal class BuilderHelpers
+{
+    internal static TResult Try<TResult, TErr>(Func<TResult> action, Dictionary<Type, Func<object, TErr>> maps, Func<Exception, TErr>? otherwise, Func<TErr, TResult> producer)
+    {
         try
         {
             return action();
         }
         catch (Exception e)
         {
-            var exceptionType = e.GetType();
+            var result = ManageException(e, maps, otherwise, producer);
 
-            foreach (var pair in _maps)
+            if (result is null)
             {
-                var type = pair.Key;
-                var map = pair.Value;
-
-                if (exceptionType == type)
-                {
-                    return TResult.Err(map(e));
-                }
+                throw;
             }
 
-            if (_else is { })
-            {
-                return TResult.Err(_else(e));
-            }
-
-            throw;
+            return result;
         }
     }
 
-    public async Task<TResult> TryAsync(Func<Task<TResult>> action)
+    internal async static Task<TResult> TryAsync<TResult, TErr>(Func<Task<TResult>> action, Dictionary<Type, Func<object, TErr>> maps, Func<Exception, TErr>? otherwise, Func<TErr, TResult> producer)
     {
         try
         {
@@ -152,26 +123,40 @@ public class ResultBuilder<TResult, TErr> : IResultBuilder<TResult, TErr>
         }
         catch (Exception e)
         {
-            var exceptionType = e.GetType();
+            var result = ManageException(e, maps, otherwise, producer);
 
-            foreach (var pair in _maps)
+            if (result is null)
             {
-                var type = pair.Key;
-                var map = pair.Value;
-
-                if (exceptionType == type)
-                {
-                    return TResult.Err(map(e));
-                }
+                throw;
             }
 
-            if (_else is { })
-            {
-                return TResult.Err(_else(e));
-            }
-
-            throw;
+            return result;
         }
     }
+
+    private static TResult? ManageException<TResult, TErr>(Exception e, Dictionary<Type, Func<object, TErr>> maps, Func<Exception, TErr>? otherwise, Func<TErr, TResult> producer)
+    {
+        var exceptionType = e.GetType();
+
+        foreach (var pair in maps)
+        {
+            var type = pair.Key;
+            var map = pair.Value;
+
+            if (exceptionType == type)
+            {
+                var result = map(e)!;
+                return producer(result);
+            }
+        }
+
+        if (otherwise is { })
+        {
+            var result = otherwise(e)!;
+
+            return producer(result);
+        }
+
+        return default;
+    }
 }
-#endif
