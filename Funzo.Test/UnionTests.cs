@@ -74,19 +74,16 @@ public class UnionTests
         Assert.True(third.Equals(first));
     }
 
-    [DoesNotReturn]
     private static void ThrowingAction<T>(T _)
     {
         throw new Exception();
     }
 
-    [DoesNotReturn]
     private static Task ThrowingActionAsync<T>(T _)
     {
         throw new Exception();
     }
 
-    [DoesNotReturn]
     private static object ThrowingFunc<T>(T _)
     {
         throw new Exception();

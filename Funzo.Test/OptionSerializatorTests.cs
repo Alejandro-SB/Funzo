@@ -6,7 +6,7 @@ namespace Funzo.Test;
 public class OptionSerializatorTests
 {
     private readonly OptionConverterFactory _optionConverterFactory = new();
-    
+
     [Fact]
     public void Can_Convert_From_Option()
     {
@@ -146,7 +146,10 @@ public class OptionSerializatorTests
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Number, Text, Date);
+            unchecked
+            {
+                return Number.GetHashCode() + Text.GetHashCode() + Date.GetHashCode();
+            }
         }
     }
 }

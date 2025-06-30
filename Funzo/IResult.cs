@@ -1,5 +1,6 @@
 ﻿namespace Funzo;
 
+
 public interface IResult<TOk, TErr>
 {
 }
