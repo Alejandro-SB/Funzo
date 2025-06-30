@@ -1,5 +1,8 @@
-﻿namespace Funzo.SourceGenerators.Test;
-public class ResultBuilderTEsts
+﻿using System;
+using System.Threading;
+
+namespace Funzo.SourceGenerators.Test;
+public class ResultBuilderTests
 {
     [Fact]
     public void ResultBuilder_Returns_Correct_Error_Based_On_Exception_Thrown()

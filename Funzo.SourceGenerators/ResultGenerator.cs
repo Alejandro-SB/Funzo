@@ -109,7 +109,7 @@ namespace {AttributeNamespace}
                 }
             }
 
-            return GenerateClassSource(classSymbol, classSymbol.BaseType.TypeParameters, typeArguments);
+            return GenerateClassSource(classSymbol, typeArguments);
 
             void CreateDiagnosticError(DiagnosticDescriptor descriptor)
             {
@@ -131,8 +131,7 @@ namespace {AttributeNamespace}
             return $"<{GetGenerics(classSymbol.TypeArguments)}>";
         }
 
-        private static string GenerateClassSource(INamedTypeSymbol classSymbol,
-            ImmutableArray<ITypeParameterSymbol> typeParameters, ImmutableArray<ITypeSymbol> typeArguments)
+        private static string GenerateClassSource(INamedTypeSymbol classSymbol, ImmutableArray<ITypeSymbol> typeArguments)
         {
             var isSimpleResult = typeArguments.Length == 1;
             var (okArgs, errArgs) = isSimpleResult

@@ -35,6 +35,5 @@ public class ResultGeneratorTests
 
 [Result]
 public partial class TestResult : IResult<Unit, string>;
-
 [Result]
 public partial class TestUnitResult : IResult<string>;

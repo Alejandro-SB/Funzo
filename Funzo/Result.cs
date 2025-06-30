@@ -57,7 +57,7 @@ public sealed class Result<TOk, TErr> : ResultBase<Result<TOk, TErr>, TOk, TErr>
 public sealed class Result<TErr> : ResultBase<Result<TErr>, TErr>
 {
     /// <inheritdoc />
-    private Result() : base()
+    private Result()
     {
     }
 

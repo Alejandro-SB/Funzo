@@ -1,12 +1,6 @@
 ﻿using Funzo.Serialization;
-using Microsoft.VisualBasic.FileIO;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Funzo.Test;
 public class OptionSerializatorTests
