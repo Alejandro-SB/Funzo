@@ -199,6 +199,73 @@ public class Result2ArityTests
         Assert.NotNull(test);
     }
 
+    [Fact]
+    public void Unwrap_Returns_Ok_Value_When_Ok()
+    {
+        var expected = 1;
+        var result = Result<int, string>.Ok(expected);
+
+        var returned = result.Unwrap();
+
+        Assert.Equal(expected, returned);
+    }
+
+    [Fact]
+    public void Unwrap_Throws_When_Err()
+    {
+        var result = Result<int, string>.Err("FAIL");
+
+        Assert.Throws<ArgumentException>(() => result.Unwrap());
+    }
+
+    [Fact]
+    public void AsOk_Returns_Option_With_Ok_Value()
+    {
+        var expected = 3;
+        var result = Result<int, string>.Ok(expected);
+
+        var option = result.AsOk();
+        var isOk = option.IsSome(out var value);
+
+        Assert.True(isOk);
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void AsOk_Returns_None_When_Err()
+    {
+        var result = Result<string, string>.Err("FAILURE");
+        var option = result.AsOk();
+
+        var isOk = option.IsSome(out var value);
+
+        Assert.Null(value);
+        Assert.False(isOk);
+    }
+
+    [Fact]
+    public void Map_Flattens_Result()
+    {
+        var result = Result<int, string>.Ok(1);
+        var mapped = result.Map(r => Result<string, string>.Ok(r.ToString()));
+
+        var isErr = mapped.IsErr(out var ok, out _);
+
+        Assert.False(isErr);
+        Assert.Equal("1", ok);
+    }
+
+    [Fact]
+    public void MapErr_Flattens_Result()
+    {
+        var result = Result<int, int>.Err(1);
+        var mapped = result.MapErr(r => Result<int, string>.Err(r.ToString()));
+
+        var isErr = mapped.IsErr( out var err);
+
+        Assert.True(isErr);
+        Assert.Equal("1", err);
+    }
     private static int OkOperation(int value) => value + 1;
     private static int ErrOperation(int value) => value - 1;
     private static void Pass<T>(T _) { }

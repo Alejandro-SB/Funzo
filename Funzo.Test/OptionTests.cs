@@ -283,7 +283,7 @@ public class OptionTests
     {
         var option = Option<int>.None();
 
-        Assert.Throws<ArgumentException>(() => option.Unwrap());
+        Assert.Throws<NullReferenceException>(() => option.Unwrap());
     }
 
     private static int MapOperation(int v) => v + 1;
