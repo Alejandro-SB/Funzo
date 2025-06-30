@@ -267,6 +267,25 @@ public class OptionTests
         Assert.Null(result);
     }
 
+    [Fact]
+    public void Unwrap_Returns_Value_When_Its_Some()
+    {
+        var expected = 3;
+        var option = Option.FromValue<int>(expected);
+
+        var result = option.Unwrap();
+
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void Unwrap_Throws_If_Option_Is_None()
+    {
+        var option = Option<int>.None();
+
+        Assert.Throws<ArgumentException>(() => option.Unwrap());
+    }
+
     private static int MapOperation(int v) => v + 1;
     private static Option<int> BindOperation(int v) => Option.Some(v + 1);
     private static Func<T> Throw<T>(string message) => () => throw new Exception(message);
