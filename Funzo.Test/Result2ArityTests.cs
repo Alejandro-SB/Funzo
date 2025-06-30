@@ -266,22 +266,10 @@ public class Result2ArityTests
         Assert.True(isErr);
         Assert.Equal("1", err);
     }
+
     private static int OkOperation(int value) => value + 1;
     private static int ErrOperation(int value) => value - 1;
     private static void Pass<T>(T _) { }
     private static Action<T> Throw<T>(string message) => (_) => throw new Exception(message);
 
-}
-
-public class Result1ArityTests
-{
-    [Fact]
-    public void Result_Can_Be_Constructed_Only_With_Err_Parameter()
-    {
-        var okResult = Result<string>.Ok();
-        var errResult = Result<string>.Err("FAILURE");
-
-        Assert.False(okResult.IsErr(out _));
-        Assert.True(errResult.IsErr(out _));
-    }
 }

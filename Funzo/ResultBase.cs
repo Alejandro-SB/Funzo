@@ -234,6 +234,7 @@ public abstract class ResultBase<TResult, TErr>
         ErrValue = err;
         IsOk = false;
     }
+
     /// <summary>
     /// Matches the result depending on the state
     /// </summary>
@@ -261,6 +262,16 @@ public abstract class ResultBase<TResult, TErr>
 
         return (TResult)this;
     }
+
+    public void EnsureOk()
+    {
+        if(!IsOk)
+        {
+            throw new ArgumentException("Result is not in OK state");
+        }
+    }
+
+    public Option<Unit> AsOk() => IsOk ? Option<Unit>.Some(Unit.Default) : Option<Unit>.None();
 
     /// <summary>
     /// Returns a new <see cref="Result{T, TErr}"/> with the value corresponding to <typeparamref name="TOk"/> transformed
