@@ -218,7 +218,7 @@ public class OptionTests
         var value = Option.Some(3);
         var test = "NOT NULL";
 
-        await value.Inspect(async x =>
+        await value.InspectAsync(async x =>
         {
             test = null;
             await Task.CompletedTask;
@@ -242,7 +242,7 @@ public class OptionTests
         var value = Option<int>.None();
         static Task throwF(int _) => throw new Exception();
 
-        await value.Inspect(throwF);
+        await value.InspectAsync(throwF);
     }
 
     [Fact]

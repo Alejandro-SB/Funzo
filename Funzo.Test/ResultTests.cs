@@ -92,6 +92,60 @@ public class Result2ArityTests
     }
 
     [Fact]
+    public void InspectErr_Is_Not_Called_When_Result_Is_Ok()
+    {
+        var result = Result<string, string>.Ok("");
+
+        var test = "TEST";
+
+        result.InspectErr(_ => test = null);
+
+        Assert.NotNull(test);
+    }
+
+    [Fact]
+    public void Inspect_Is_Called_When_Result_Is_Err()
+    {
+        var result = Result<string, string>.Err("");
+
+        var test = "TEST";
+
+        result.InspectErr(_ => test = null);
+
+        Assert.Null(test);
+    }
+
+    [Fact]
+    public void Inspect_Is_Not_Called_Async_When_Result_Is_Ok()
+    {
+        var result = Result<string, string>.Ok("TEST STRING");
+
+        var test = "TEST";
+
+        result.InspectErr(_ =>
+        {
+            test = null;
+        });
+
+        Assert.NotNull(test);
+    }
+
+    [Fact]
+    public void Inspect_Is_Called_Async_When_Result_Is_Err()
+    {
+        var result = Result<string, string>.Err("");
+
+        var test = "TEST";
+
+        result.InspectErr(_ =>
+        {
+            test = null;
+        });
+
+        Assert.Null(test);
+    }
+
+    [Fact]
     public void Inspect_Is_Called_When_Result_Is_Ok()
     {
         var result = Result<string, string>.Ok("");
@@ -143,6 +197,25 @@ public class Result2ArityTests
         });
 
         Assert.NotNull(test);
+    }
+
+    [Fact]
+    public void Unwrap_Returns_Value_When_Its_Some()
+    {
+        var expected = 3;
+        var option = Option.FromValue<int>(expected);
+
+        var result = option.Unwrap();
+
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void Unwrap_Throws_If_Option_Is_None()
+    {
+        var option = Option<int>.None();
+
+        Assert.Throws<ArgumentException>(() => option.Unwrap());
     }
 
     private static int OkOperation(int value) => value + 1;

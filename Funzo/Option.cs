@@ -77,7 +77,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     /// </summary>
     /// <param name="action">The action to take</param>
     /// <returns></returns>
-    public async Task<Option<T>> Inspect(Func<T, Task> action)
+    public async Task<Option<T>> InspectAsync(Func<T, Task> action)
     {
         if(_hasValue)
         {

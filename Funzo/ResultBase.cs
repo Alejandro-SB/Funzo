@@ -6,6 +6,7 @@ namespace Funzo;
 /// </summary>
 /// <typeparam name="TOk"></typeparam>
 /// <typeparam name="TErr"></typeparam>
+/// <typeparam name="TResult"></typeparam>
 public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>
     where TResult : ResultBase<TResult, TOk, TErr>
 {
