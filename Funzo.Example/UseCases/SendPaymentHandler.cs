@@ -18,4 +18,4 @@ internal class SendPaymentHandler
 }
 
 [Result]
-public partial class SendPaymentResult : Result<PaymentError>;
+public partial class SendPaymentResult : IResult<PaymentError>;

@@ -6,7 +6,7 @@ namespace Funzo;
 /// Represents a variable of type <typeparamref name="T"/> that may have no value
 /// </summary>
 /// <typeparam name="T">The type of the internal value</typeparam>
-public sealed class Option<T> : IEquatable<Option<T>>
+public readonly struct Option<T> : IEquatable<Option<T>>
 {
     /// <summary>
     /// If true, a value has been supplied
@@ -22,12 +22,6 @@ public sealed class Option<T> : IEquatable<Option<T>>
     {
         _value = value ?? throw new ArgumentNullException(nameof(value));
         _hasValue = true;
-    }
-
-    private Option() 
-    {
-        _value = default;
-        _hasValue = false;
     }
 
     /// <summary>
@@ -68,12 +62,14 @@ public sealed class Option<T> : IEquatable<Option<T>>
     /// Inspects the value of the option if it exists
     /// </summary>
     /// <param name="action">The action to take</param>
-    public void Inspect(Action<T> action)
+    public Option<T> Inspect(Action<T> action)
     {
         if(_hasValue)
         {
             action(_value!);
         }
+
+        return this;
     }
 
     /// <summary>
@@ -81,12 +77,14 @@ public sealed class Option<T> : IEquatable<Option<T>>
     /// </summary>
     /// <param name="action">The action to take</param>
     /// <returns></returns>
-    public async Task Inspect(Func<T, Task> action)
+    public async Task<Option<T>> InspectAsync(Func<T, Task> action)
     {
         if(_hasValue)
         {
             await action(_value!);
         }
+
+        return this;
     }
 
     /// <summary>
@@ -163,13 +161,8 @@ public sealed class Option<T> : IEquatable<Option<T>>
         => obj is Option<T> option && option.Equals(this);
 
     /// <inheritdoc/>
-    public bool Equals(Option<T>? other)
+    public bool Equals(Option<T> other)
     {
-        if (other is null)
-        {
-            return false;
-        }
-
         if (!_hasValue && !other._hasValue)
         {
             return true;
@@ -179,6 +172,10 @@ public sealed class Option<T> : IEquatable<Option<T>>
             ? _value!.Equals(other._value)
             : other._value!.Equals(_value);
     }
+    /// <inheritdoc />
+    public static bool operator ==(Option<T> lhs, Option<T> rhs) => lhs.Equals(rhs);
+    /// <inheritdoc />
+    public static bool operator !=(Option<T> lhs, Option<T> rhs) => !(lhs == rhs);
 }
 
 /// <summary>

@@ -9,7 +9,7 @@ public class PaymentProvider
 
     public async Task<SendPaymentResult> Pay(PaymentRequest paymentRequest, CancellationToken cancellationToken)
     {
-        if(!_validAccounts.Contains(paymentRequest.DestinationAccountId))
+        if (!_validAccounts.Contains(paymentRequest.DestinationAccountId))
         {
             return SendPaymentResult.Err(new InvalidAccountError(paymentRequest.DestinationAccountId));
         }
@@ -24,7 +24,7 @@ public class PaymentProvider
 
         var effectiveDate = paymentRequest.EffectiveDate.ValueOr(now);
 
-        if(effectiveDate > nextMonth)
+        if (effectiveDate > nextMonth)
         {
             return SendPaymentResult.Err(new InvalidEffectiveDateError(effectiveDate));
         }

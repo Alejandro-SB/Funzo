@@ -1,5 +1,5 @@
-using Funzo;
-using System.Text.Json;
+using System;
+using System.Threading.Tasks;
 
 namespace Funzo.Test;
 
@@ -218,7 +218,7 @@ public class OptionTests
         var value = Option.Some(3);
         var test = "NOT NULL";
 
-        await value.Inspect(async x =>
+        await value.InspectAsync(async x =>
         {
             test = null;
             await Task.CompletedTask;
@@ -242,7 +242,7 @@ public class OptionTests
         var value = Option<int>.None();
         static Task throwF(int _) => throw new Exception();
 
-        await value.Inspect(throwF);
+        await value.InspectAsync(throwF);
     }
 
     [Fact]
@@ -265,6 +265,25 @@ public class OptionTests
         var result = none.ValueOrDefault();
 
         Assert.Null(result);
+    }
+
+    [Fact]
+    public void Unwrap_Returns_Value_When_Its_Some()
+    {
+        var expected = 3;
+        var option = Option.FromValue<int>(expected);
+
+        var result = option.Unwrap();
+
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void Unwrap_Throws_If_Option_Is_None()
+    {
+        var option = Option<int>.None();
+
+        Assert.Throws<NullReferenceException>(() => option.Unwrap());
     }
 
     private static int MapOperation(int v) => v + 1;

@@ -35,7 +35,7 @@ public class OptionConverterFactory : JsonConverterFactory
 public class OptionConverter<T> : JsonConverter<Option<T>>
 {
     /// <inheritdoc />
-    public override Option<T>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override Option<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType is not JsonTokenType.StartObject)
         {

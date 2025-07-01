@@ -25,23 +25,23 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>
     public int CompareTo(Unit other) => 0;
 
     /// <inheritdoc/>
-    public static bool operator ==(Unit lhs, Unit rhs) => true;
+    public static bool operator ==(Unit _, Unit __) => true;
 
     /// <inheritdoc/>
-    public static bool operator !=(Unit lhs, Unit rhs) => false;
+    public static bool operator !=(Unit _, Unit __) => false;
 
     /// <inheritdoc/>
-    public static bool operator >(Unit lhs, Unit rhs) => false;
+    public static bool operator >(Unit _, Unit __) => false;
 
     /// <inheritdoc/>
-    public static bool operator >=(Unit lhs, Unit rhs) => true;
+    public static bool operator >=(Unit _, Unit __) => true;
 
     /// <inheritdoc/>
-    public static bool operator <(Unit lhs, Unit rhs) => false;
+    public static bool operator <(Unit _, Unit __) => false;
 
     /// <inheritdoc/>
-    public static bool operator <=(Unit lhs, Unit rhs) => true;
+    public static bool operator <=(Unit _, Unit __) => true;
 
     /// <inheritdoc/>
-    public static Unit operator +(Unit a, Unit b) => default;
+    public static Unit operator +(Unit _, Unit __) => default;
 }

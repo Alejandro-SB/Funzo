@@ -28,6 +28,10 @@ public static class ResultExtensions
     /// <returns>A wrapper around the original task</returns>
     public static Task Match<TOk, TErr>(this Task<Result<TOk, TErr>> task, Action<TOk> ok, Action<TErr> fail)
     {
-        return task.Then(t => t.Match(ok, fail));
+        return task.Then(t =>
+        {
+            t.Match(ok, fail);
+            return Task.CompletedTask;
+        });
     }
 }
