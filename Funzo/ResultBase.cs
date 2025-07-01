@@ -2,13 +2,13 @@
 
 namespace Funzo;
 /// <summary>
-/// 
+/// Class that represents a Result
 /// </summary>
-/// <typeparam name="TOk"></typeparam>
-/// <typeparam name="TErr"></typeparam>
-/// <typeparam name="TResult"></typeparam>
-public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>
-    where TResult : ResultBase<TResult, TOk, TErr>
+/// <typeparam name="TOk">Type of the Ok value</typeparam>
+/// <typeparam name="TErr">Type of the Error value</typeparam>
+/// <typeparam name="TResult">Type of the result</typeparam>
+public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>, IEquatable<ResultBase<TResult, TOk, TErr>>
+    where TResult : ResultBase<TResult, TOk, TErr>, IResultBase<TResult, TOk, TErr>
 {
     private protected readonly bool IsOk;
     private protected readonly TOk? OkValue;
@@ -33,6 +33,7 @@ public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>
         ErrValue = err;
         IsOk = false;
     }
+
     /// <summary>
     /// Matches the result depending on the state
     /// </summary>
@@ -60,6 +61,11 @@ public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>
         return (TResult)this;
     }
 
+    /// <summary>
+    /// Executes an action if the result is OK
+    /// </summary>
+    /// <param name="action">The action to execute</param>
+    /// <returns>The same result</returns>
     public TResult Inspect(Action<TOk> action)
     {
         if (IsOk)
@@ -70,6 +76,11 @@ public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>
         return (TResult)this;
     }
 
+    /// <summary>
+    /// Executes an async action if the result is OK
+    /// </summary>
+    /// <param name="action">The action to execute</param>
+    /// <returns>The same result</returns>
     public async Task<TResult> InspectAsync(Func<TOk, Task> action)
     {
         if (IsOk)
@@ -80,6 +91,11 @@ public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>
         return (TResult)this;
     }
 
+    /// <summary>
+    /// Executes an action if the result is an Error
+    /// </summary>
+    /// <param name="action">The action to execute</param>
+    /// <returns>The same result</returns>
     public TResult InspectErr(Action<TErr> action)
     {
         if (!IsOk)
@@ -90,6 +106,11 @@ public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>
         return (TResult)this;
     }
 
+    /// <summary>
+    /// Executes an async action if the result is an Error
+    /// </summary>
+    /// <param name="action">The action to execute</param>
+    /// <returns>The same result</returns>
     public async Task<TResult> InspectErrAsync(Func<TErr, Task> action)
     {
         if (!IsOk)
@@ -205,17 +226,51 @@ public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>
 
         return map(ErrValue!);
     }
+
+    /// <summary>
+    /// Creates a builder to map exceptions into a <see cref="ResultBase{TResult, TOk, TErr}"/>
+    /// </summary>
+    /// <returns>A builder to map exceptions into a <see cref="ResultBase{TResult, TOk, TErr}"/></returns>
+    public static IResultBuilder<TResult, TOk, TErr> For() => new ResultBuilder<TResult, TOk, TErr>();
+
+    /// <inheritdoc />
+    public bool Equals(ResultBase<TResult, TOk, TErr>? other)
+    {
+        return other is not null
+            && other.IsOk == IsOk
+            && (
+                (other.IsOk && other.OkValue!.Equals(OkValue!))
+                || (!other.IsOk && other.ErrValue!.Equals(ErrValue!))
+            );
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode() => IsOk ? 0 : ErrValue!.GetHashCode();
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is ResultBase<TResult, TOk, TErr> result && result.Equals(this);
+    }
+
+    /// <inheritdoc />
+    public static bool operator ==(ResultBase<TResult, TOk, TErr> lhs, ResultBase<TResult, TOk, TErr> rhs)
+        => lhs.Equals(rhs);
+    /// <inheritdoc />
+    public static bool operator !=(ResultBase<TResult, TOk, TErr> lhs, ResultBase<TResult, TOk, TErr> rhs)
+        => !(lhs == rhs);
 }
 
 /// <summary>
-/// 
+/// Class that represents a Result
 /// </summary>
-/// <typeparam name="TErr"></typeparam>
-public abstract class ResultBase<TResult, TErr>
-    where TResult : ResultBase<TResult, TErr>
+/// <typeparam name="TResult">The type of the result</typeparam>
+/// <typeparam name="TErr">The type of the error</typeparam>
+public abstract class ResultBase<TResult, TErr> : IResult<TErr>, IEquatable<ResultBase<TResult, TErr>>
+    where TResult : ResultBase<TResult, TErr>, IResultBase<TResult, TErr>
 {
-    protected readonly bool IsOk;
-    protected readonly TErr? ErrValue;
+    private protected readonly bool IsOk;
+    private protected readonly TErr? ErrValue;
 
     /// <summary>
     /// Creates a new instance of the <see cref="Result{TOk, TErr}"/> class as an OK result
@@ -238,7 +293,7 @@ public abstract class ResultBase<TResult, TErr>
     /// <summary>
     /// Matches the result depending on the state
     /// </summary>
-    /// <typeparam name="TResult">The final result type</typeparam>
+    /// <typeparam name="TOut">The final result type</typeparam>
     /// <param name="ok">The function to execute if the operation was successful</param>
     /// <param name="err">The function to execute if the operation failed</param>
     /// <returns>The result of the mapping function depending on the result</returns>
@@ -263,20 +318,28 @@ public abstract class ResultBase<TResult, TErr>
         return (TResult)this;
     }
 
+    /// <summary>
+    /// Ensures that this instance is an Ok value. This method should be avoided whenever possible in favour of <see cref="IsErr(out TErr?)"></see>
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown if this instance is not in an Ok state</exception>
     public void EnsureOk()
     {
-        if(!IsOk)
+        if (!IsOk)
         {
             throw new ArgumentException("Result is not in OK state");
         }
     }
 
+    /// <summary>
+    /// Returns an <see cref="Option{T}"/> with a Some value if result is in an Ok state, None otherwise
+    /// </summary>
+    /// <returns>This result as an option</returns>
     public Option<Unit> AsOk() => IsOk ? Option<Unit>.Some(Unit.Default) : Option<Unit>.None();
 
     /// <summary>
-    /// Returns a new <see cref="Result{T, TErr}"/> with the value corresponding to <typeparamref name="TOk"/> transformed
+    /// Returns a new <see cref="Result{T, TErr}"/> with a new return value for the Ok state
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The new Ok value</typeparam>
     /// <param name="map">The transformation to apply</param>
     /// <returns>A new <see cref="Result{T, TErr}"/> transformed</returns>
     public Result<T, TErr> Map<T>(Func<T> map)
@@ -290,7 +353,7 @@ public abstract class ResultBase<TResult, TErr>
     }
 
     /// <summary>
-    /// Returns a new <see cref="Result{T, TErr}"/> with the value corresponding to <typeparamref name="TOk"/> transformed
+    /// Returns a new <see cref="Result{T, TErr}"/> with a new return value for the Ok state
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="map">The transformation to apply</param>
@@ -337,7 +400,11 @@ public abstract class ResultBase<TResult, TErr>
         return map(ErrValue!);
     }
 
-
+    /// <summary>
+    /// Executes an action if the result is OK
+    /// </summary>
+    /// <param name="action">The action to execute</param>
+    /// <returns>The same result</returns>
     public TResult Inspect(Action action)
     {
         if (IsOk)
@@ -348,6 +415,11 @@ public abstract class ResultBase<TResult, TErr>
         return (TResult)this;
     }
 
+    /// <summary>
+    /// Executes an async action if the result is OK
+    /// </summary>
+    /// <param name="action">The action to execute</param>
+    /// <returns>The same result</returns>
     public async Task<TResult> InspectAsync(Func<Task> action)
     {
         if (IsOk)
@@ -358,6 +430,11 @@ public abstract class ResultBase<TResult, TErr>
         return (TResult)this;
     }
 
+    /// <summary>
+    /// Executes an action if the result is an Error
+    /// </summary>
+    /// <param name="action">The action to execute</param>
+    /// <returns>The same result</returns>
     public TResult InspectErr(Action<TErr> action)
     {
         if (!IsOk)
@@ -368,6 +445,11 @@ public abstract class ResultBase<TResult, TErr>
         return (TResult)this;
     }
 
+    /// <summary>
+    /// Executes an async action if the result is an Error
+    /// </summary>
+    /// <param name="action">The action to execute</param>
+    /// <returns>The same result</returns>
     public async Task<TResult> InspectErrAsync(Func<TErr, Task> action)
     {
         if (!IsOk)
@@ -390,4 +472,36 @@ public abstract class ResultBase<TResult, TErr>
 
         return !IsOk;
     }
+
+    /// <summary>
+    /// Creates a builder to map exceptions into a <see cref="ResultBase{TResult, TOk, TErr}"/>
+    /// </summary>
+    /// <returns>A builder to map exceptions into a <see cref="ResultBase{TResult, TOk, TErr}"/></returns>
+    public static IResultBuilder<TResult, TErr> For() => new ResultBuilder<TResult, TErr>();
+
+    /// <inheritdoc />
+    public bool Equals(ResultBase<TResult, TErr>? other)
+    {
+        return other is not null
+            && other.IsOk == IsOk
+            && (
+                other.IsOk
+                || other.ErrValue!.Equals(ErrValue!)
+            );
+    }
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is ResultBase<TResult, TErr> result && result.Equals(this);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode() => IsOk ? 0 : ErrValue!.GetHashCode();
+
+    /// <inheritdoc />
+    public static bool operator ==(ResultBase<TResult, TErr> lhs, ResultBase<TResult, TErr> rhs)
+        => lhs.Equals(rhs);
+    /// <inheritdoc />
+    public static bool operator !=(ResultBase<TResult, TErr> lhs, ResultBase<TResult, TErr> rhs)
+        => !(lhs == rhs);
 }

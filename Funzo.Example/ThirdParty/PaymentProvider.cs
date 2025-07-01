@@ -9,29 +9,28 @@ public class PaymentProvider
 
     public async Task<SendPaymentResult> Pay(PaymentRequest paymentRequest, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-        //if(!_validAccounts.Contains(paymentRequest.DestinationAccountId))
-        //{
-        //    return SendPaymentResult.Err(new InvalidAccountError(paymentRequest.DestinationAccountId));
-        //}
+        if (!_validAccounts.Contains(paymentRequest.DestinationAccountId))
+        {
+            return SendPaymentResult.Err(new InvalidAccountError(paymentRequest.DestinationAccountId));
+        }
 
-        //if (_balance < paymentRequest.Amount)
-        //{
-        //    return SendPaymentResult.Err(new InsufficientFundsError(_balance));
-        //}
+        if (_balance < paymentRequest.Amount)
+        {
+            return SendPaymentResult.Err(new InsufficientFundsError(_balance));
+        }
 
-        //var now = DateTimeOffset.UtcNow;
-        //var nextMonth = now.AddMonths(1);
+        var now = DateTimeOffset.UtcNow;
+        var nextMonth = now.AddMonths(1);
 
-        //var effectiveDate = paymentRequest.EffectiveDate.ValueOr(now);
+        var effectiveDate = paymentRequest.EffectiveDate.ValueOr(now);
 
-        //if(effectiveDate > nextMonth)
-        //{
-        //    return SendPaymentResult.Err(new InvalidEffectiveDateError(effectiveDate));
-        //}
+        if (effectiveDate > nextMonth)
+        {
+            return SendPaymentResult.Err(new InvalidEffectiveDateError(effectiveDate));
+        }
 
-        //_balance -= paymentRequest.Amount;
+        _balance -= paymentRequest.Amount;
 
-        //return SendPaymentResult.Ok();
+        return SendPaymentResult.Ok();
     }
 }

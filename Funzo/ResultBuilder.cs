@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace Funzo;
 
-public class ResultBuilder<TResult, TOk, TErr> : IResultBuilder<TResult, TOk, TErr>
+internal class ResultBuilder<TResult, TOk, TErr> : IResultBuilder<TResult, TOk, TErr>
     where TResult : IResultBase<TResult, TOk, TErr>
 {
     private readonly Dictionary<Type, Func<object, TErr>> _maps = new();
@@ -29,15 +24,11 @@ public class ResultBuilder<TResult, TOk, TErr> : IResultBuilder<TResult, TOk, TE
         return this;
     }
 
-    public TResult Try(Func<TResult> action)
-    {
-        return BuilderHelpers.Try(action, _maps, _else, Producer);
-    }
+    public TResult Try(Func<TResult> action) 
+        => BuilderHelpers.Try(action, _maps, _else, Producer);
 
-    public async Task<TResult> TryAsync(Func<Task<TResult>> action)
-    {
-        return await BuilderHelpers.TryAsync(action, _maps, _else, Producer);
-    }
+    public async Task<TResult> TryAsync(Func<Task<TResult>> action) 
+        => await BuilderHelpers.TryAsync(action, _maps, _else, Producer);
 
     private TResult Producer(TErr err)
     {
@@ -51,7 +42,7 @@ public class ResultBuilder<TResult, TOk, TErr> : IResultBuilder<TResult, TOk, TE
 }
 
 
-public class ResultBuilder<TResult, TErr> : IResultBuilder<TResult, TErr>
+internal class ResultBuilder<TResult, TErr> : IResultBuilder<TResult, TErr>
     where TResult : IResultBase<TResult, TErr>
 {
     private readonly Dictionary<Type, Func<object, TErr>> _maps = new();
@@ -73,15 +64,11 @@ public class ResultBuilder<TResult, TErr> : IResultBuilder<TResult, TErr>
         return this;
     }
 
-    public TResult Try(Func<TResult> action)
-    {
-        return BuilderHelpers.Try(action, _maps, _else, Producer);
-    }
+    public TResult Try(Func<TResult> action) 
+        => BuilderHelpers.Try(action, _maps, _else, Producer);
 
-    public async Task<TResult> TryAsync(Func<Task<TResult>> action)
-    {
-        return await BuilderHelpers.TryAsync(action, _maps, _else, Producer);
-    }
+    public async Task<TResult> TryAsync(Func<Task<TResult>> action) 
+        => await BuilderHelpers.TryAsync(action, _maps, _else, Producer);
 
     private TResult Producer(TErr err)
     {

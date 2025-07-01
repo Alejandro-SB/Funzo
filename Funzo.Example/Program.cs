@@ -14,14 +14,14 @@ internal class Program
 
         var paymentResult = await sendPaymentHandler.Handle(request, CancellationToken.None);
 
-        //var response = paymentResult.Match(
-        //    ok: () => "Payment successful", 
-        //    err: err => err.Match(
-        //        (InvalidAccountError invalidAccount) => $"The account {invalidAccount.AccountId} does not exist",
-        //        (InsufficientFundsError insufficientFunds) => $"Your account has {insufficientFunds.CurrentFunds:C2}. You need {totalToSend - insufficientFunds.CurrentFunds} more in your account",
-        //        (InvalidEffectiveDateError invalidDate) => $"The date {invalidDate.SuppliedDate:o} is not valid")
-        //);
+        var response = paymentResult.Match(
+            ok: () => "Payment successful",
+            err: err => err.Match(
+                (InvalidAccountError invalidAccount) => $"The account {invalidAccount.AccountId} does not exist",
+                (InsufficientFundsError insufficientFunds) => $"Your account has {insufficientFunds.CurrentFunds:C2}. You need {totalToSend - insufficientFunds.CurrentFunds} more in your account",
+                (InvalidEffectiveDateError invalidDate) => $"The date {invalidDate.SuppliedDate:o} is not valid")
+        );
 
-        //Console.WriteLine(response);
+        Console.WriteLine(response);
     }
 }

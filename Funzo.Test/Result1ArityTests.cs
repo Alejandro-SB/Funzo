@@ -1,6 +1,5 @@
-﻿using Funzo;
-using System;
-using System.Text.Json;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Funzo.Test;
 public class Result1ArityTests
@@ -192,7 +191,7 @@ public class Result1ArityTests
         var result = Result<string>.Ok();
 
         var option = result.AsOk();
-        var isOk = option.IsSome(out var value);
+        var isOk = option.IsSome(out _);
 
         Assert.True(isOk);
     }
@@ -231,6 +230,30 @@ public class Result1ArityTests
 
         Assert.True(isErr);
         Assert.Equal("1", err);
+    }
+
+    [Fact]
+    public async Task InspectAsync_Executes_Action_When_Ok()
+    {
+        var okResult = Result<string>.Ok();
+
+        await Assert.ThrowsAsync<AccessViolationException>(() => okResult.InspectAsync(() => throw new AccessViolationException()));
+
+        var errResult = Result<string>.Err("fail");
+
+        await errResult.InspectAsync(() => throw new Exception("Should not reach"));
+    }
+
+    [Fact]
+    public async Task InspectErrAsync_Executes_Action_When_Err()
+    {
+        var errResult = Result<string>.Err("fail");
+
+        await Assert.ThrowsAsync<AccessViolationException>(() => errResult.InspectErrAsync(_ => throw new AccessViolationException()));
+
+        var okResult = Result<string>.Ok();
+
+        await okResult.InspectErrAsync(_ => throw new Exception("Should not reach"));
     }
 
     private static void Pass() { }

@@ -172,6 +172,10 @@ public readonly struct Option<T> : IEquatable<Option<T>>
             ? _value!.Equals(other._value)
             : other._value!.Equals(_value);
     }
+    /// <inheritdoc />
+    public static bool operator ==(Option<T> lhs, Option<T> rhs) => lhs.Equals(rhs);
+    /// <inheritdoc />
+    public static bool operator !=(Option<T> lhs, Option<T> rhs) => !(lhs == rhs);
 }
 
 /// <summary>
