@@ -33,7 +33,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     public Option<TResult> Map<TResult>(Func<T, TResult> map)
         => _hasValue
         ? map(_value!)
-        : Option<TResult>.None();
+        : Option<TResult>.None;
 
     /// <summary>
     /// Maps and flattens the current instance to another type
@@ -44,7 +44,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     public Option<TResult> Map<TResult>(Func<T, Option<TResult>> map)
         => _hasValue
         ? map(_value!)
-        : Option<TResult>.None();
+        : Option<TResult>.None;
 
     /// <summary>
     /// Returns a result based on the presence or absence of value
@@ -64,7 +64,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     /// <param name="action">The action to take</param>
     public Option<T> Inspect(Action<T> action)
     {
-        if(_hasValue)
+        if (_hasValue)
         {
             action(_value!);
         }
@@ -79,7 +79,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     /// <returns></returns>
     public async Task<Option<T>> InspectAsync(Func<T, Task> action)
     {
-        if(_hasValue)
+        if (_hasValue)
         {
             await action(_value!);
         }
@@ -113,7 +113,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     /// </summary>
     /// <param name="value">The value contained in this instance, or <see langword="default"/> if no value present</param>
     /// <returns><see langword="true" /> when a value exists, <see langword="false" /> otherwise</returns>
-    public bool IsSome([NotNullWhen(true)]out T? value)
+    public bool IsSome([NotNullWhen(true)] out T? value)
     {
         value = _value!;
 
@@ -140,8 +140,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     /// Creates an empty instance of <see cref="Option{T}"/>
     /// </summary>
     /// <returns>An empty instance of <see cref="Option{T}"/></returns>
-    public static Option<T> None()
-        => new();
+    public static Option<T> None => new();
 
     /// <summary>
     /// Returns the string representation of this class
@@ -200,7 +199,7 @@ public static class Option
     /// <returns>The <see cref="Option{T}"/> instance</returns>
     public static Option<T> FromValue<T>(T? value)
         where T : class
-        => value is null ? Option<T>.None() : Option<T>.Some(value);
+        => value is null ? Option<T>.None : Option<T>.Some(value);
 
     /// <summary>
     /// Creates a new <see cref="Option{T}"/> instance based on the value supplied
@@ -210,7 +209,7 @@ public static class Option
     /// <returns>The <see cref="Option{T}"/> instance</returns>
     public static Option<T> FromValue<T>(T? value)
         where T : struct
-        => value is { } v ? Option<T>.Some(v) : Option<T>.None();
+        => value is { } v ? Option<T>.Some(v) : Option<T>.None;
 
     /// <summary>
     /// Creates a continuation of the current task that will map the value returned

@@ -46,7 +46,7 @@ public class OptionConverter<T> : JsonConverter<Option<T>>
 
         return deserializedValue.HasValue
             ? Option.Some(deserializedValue.Value!)
-            : Option<T>.None();
+            : Option<T>.None;
     }
 
     /// <inheritdoc />

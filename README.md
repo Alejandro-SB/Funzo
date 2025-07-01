@@ -12,6 +12,7 @@
     - [Unit](#unit)
     - [Option](#option)
     - [Result](#result)
+    - [ResultBuilder](#resultbuilder)
     - [Union](#union)
 - [Serialization](#serialization)
 - [Example](#example)
@@ -40,20 +41,22 @@ _Funzo_ allows the developer to use some classes more commonly used in functiona
 ## Usage (recommended way)
 The best way to approach this package is through source generators. This will allow you to define your types with ease and work on your problems straight away.
 You will need the `Funzo` and `Funzo.SourceGenerators` packages.
-If you want to create a result, you can just create a partial class inheriting from `Result` or `Union` and decorate them with the `Result`/`Union` attribute.
+For unions, inherit from the `Union` class and decorate it with the `Union` attribute.
+For results, implement the interface `IResult<TOk, TErr>` or `IResult<TErr>` and decorate it with the attribute `Result`.
+In both cases, the class should be partial so new code can be generated.
 
 ```Csharp
 [Union]
 public partial class ApiError : Union<Error1, Error2, Error3>;
 
 [Result]
-public partial class ApiCallResult : Result<ApiError>;
+public partial class ApiCallResult : IResult<ApiError>;
 
 [Union]
 public partial class ItemCreationError : Union<ItemWithNameAlreadyExists, InvalidItemName, EmptyItemName>;
 
 [Result]
-public partial class ItemCreatedResult : Result<ItemId, ItemCreationError>;
+public partial class ItemCreatedResult : IResult<ItemId, ItemCreationError>;
 ```
 
 
@@ -119,7 +122,7 @@ var optionValue = Option.Some(1);
 
 var value = optionValue.Unwrap() // 1
 
-var optionString = Option<string>.None();
+var optionString = Option<string>.None;
 optionString.Unwrap(); // throws NullReferenceException
 ```
 
@@ -139,8 +142,7 @@ user.Inspect(user => Console.WriteLine($"Retrieved user {user.Name}");
 ```
 
 ### Result
-
-If you want to create a `Result` that will return `Unit`, you can now use the `Result<TErr>` variant. This also removes the need to supply `Unit` to the `Ok` static method.
+To use results, you can use the already existing classes `Result<TOk, TErr>` or `Result<TErr>`, depending on whether you need an Ok value, or use the source generators (much recommended, see above).
 
 You can create an instance using the Ok/Err static methods:
 ```Csharp
@@ -166,11 +168,11 @@ result.Match(
     });
 ```
 
-Sometimes you only want to know if an operation has completed successfully to get the ok value. You can use the `Ok` method:
+Sometimes you only want to know if an operation has completed successfully to get the ok value. You can use the `AsOk` method:
 ```Csharp
 var parsingResult = ParseLines(path);
 
-var linesParsed = parsingResult.Ok().ValueOr(0);
+var linesParsed = parsingResult.AsOk().ValueOr(0);
 
 Console.WriteLine($"Parsed {linesParsed} lines");
 ```
@@ -205,7 +207,67 @@ public async IResult Post([FromBody] UserPayload payload)
         });
 ```
 
-Same as `Option`, we have 2 new methods: `Inspect` and `InspectErr` in case you want to do something with the values without actually changing anything.
+Same as `Option`, we have 2 new methods: `Inspect` and `InspectErr` (and their async variants) in case you want to do something with the values without actually changing anything.
+
+### ResultBuilder
+Created by using the static method `For`, lets you map different exceptions to errors, allowing you to migrate from an exception based approach to a result based approach.
+
+So you can move from this:
+```Csharp
+public async Task Main()
+{
+    try
+    {
+        await ReserveTable(userId, reservationDate);
+    }
+    catch(Exception e)
+    {
+        // Manage
+    }
+}
+
+public Task<int> ReserveTable(int userId, DateTime reservationDate)
+{
+    if(reservationDate.TimeOfDay > TimeSpan.FromHours(22))
+    {
+        throw new RestaurantClosedException("Restaurant is closed at 22:00h");
+    }
+
+    var freeTables = await GetFreeTables(reservationDate);
+
+    if(freeTables is null || freeTables.Count == 0)
+    {
+        throw new RoomFullException("There are no free tables");
+    }
+
+    var reservation = new Reservation(userId, reservationDate);
+    context.Reservations.Add(reservation);
+
+    await context.SaveChangesAsync();
+
+    return reservation.Id;
+}
+```
+
+To this:
+```Csharp
+public async Task Main()
+{
+    ReservationResult.For()
+        .MapException<RestaurantClosedException>(e => new RestaurantClosedError())
+        .MapException<RoomFullException>(e => new RoomFullError())
+        .MapElse(e => new UnknownError())
+        .TryAsync(async () => await ReserveTable(userId, reservationDate));
+}
+
+[Result]
+public partial class ReservationResult : IResult<int, ReservationError>;
+
+[Union]
+public partial class ReservationError : Union<RestaurantClosed, RoomFullError, UnknownError>;
+```
+
+In this way, you can refactor safely and remove exceptions one by one, making all your methods explicit about how they can fail so the developer can handle it.
 
 ### Union
 Unions represent a variable that can be of several different types. At the moment, there are only unions for 5 generic types max. This was on purpose, as it usually more than 5 means you need a refactor to group some of them (at least in my opinion). If you need more, feel free to use the `Funzo.Generator` project and change the ordinality to whatever you need.
@@ -279,100 +341,3 @@ In order to achieve this, an approach of *Explicit better than implicit* was use
 - When working with `Result`, minimize the risk of unforseen consequences (λ) by encouraging to use the `Match` statement.
 - Unions don't have the possibility of getting the value explicitly, forcing the developer to use the `Is` method or `Switch`/`Match`
 - Encourage the usage of Error values, let it be records with some payload or enums, that provide useful information and force the developer to take action for each one of them. By being explicit in what kind of errors can pop out, the developer is forced to handle all the cases than can go wrong and not rely on catch blocks.
-
-## What's missing (updated)
-I had to update this list, as with the inclusion of `Union` types a lot can be achieved.
-- ~~In order to create a `Result`, both types should be specified. This is annoying, because when you are using large class names, you end up doing:~~
-    ```Csharp
-    public async Task<Result<CreateUserReturnValue, CreateUserError>> CreateUser(CreateUserPayload payload)
-    {
-    ...
-        if (**somecondition**)
-        {
-            return Result<CreateUserReturnValue, CreateUserError>.Err(...);
-        }
-    ...
-    }
-    ```
-    ~~This can be mitigated by using `using` alias like this:~~
-    ```Csharp
-    using CreateUserResult = Funzo.Result<UseCases.CreateUserReturnValue, UseCases.CreateUserError>;
-
-    public async Task<CreateUserResult> CreateUser(CreateUserPayload payload)
-    {
-    ...
-        if (**somecondition**)
-        {
-            return CreateUserResult.Err(...);
-        }
-    ...
-    }
-    ```
-    **This is solved by allowing inheritance with the source generator attribute**
-
-    You can now just do:
-    ```Csharp
-    [Result]
-    public partial class MyProcessResult : Result<Id, UnionError>;
-    ```
-    And the signature would be:
-    ```Csharp
-    public async Task<MyProcessResult> Handle(...)
-    ```
-
-- ~~`Result<Unit, _>` feels weird, as you have to manually do `Result<Unit, _>.Ok(default)` or `Result<Unit, _>.Ok(new Unit())`. No workaround for this I'm afraid.~~
-    
-  **This is also solved by using the class `Result<TErr>`** 
-- Early returns feel off. I would've loved to have something similar to [Rust's question mark](https://doc.rust-lang.org/rust-by-example/std/result/question_mark.html), but `Option.IsSome` and `Result.IsErr` are the closest things I could think of.
-- ~~The absence of `union types`/`discriminated unions`/`closed enums` make managing the different options underwhelming and unreliable if you are not careful. If you have a method like this:~~ 
-    ```Csharp
-    enum ProcessError
-    {
-        FailureA,
-        FailureB
-    }
-
-    Result<Unit, ProcessError> DoProcess() { ... }
-
-    public void Run() 
-    {
-        var result = DoProcess();
-
-        result.Match(_ => Console.WriteLine("Success"),
-        err => err switch
-        {
-            ProcessError.FailureA => Console.WriteLine("FailureA"),
-            ProcessError.FailureB => Console.WriteLine("FailureB"),
-        });
-    }
-    ```
-    ~~You may think that you are handling everything, as the enum only has 2 options, but you would receive a warning. 
-    This is because enums are `int` in C#, so you could do `(ProcessError)435627` and pass. 
-    Their proposed solution is to add a general case `_ => WHATEVER` but this is exactly what this library is trying to avoid. Again, the goal is to be explicit, because if you add a default case, you will not receive a warning nor an error when you add another error in `ProcessError`. So the only option for now is to disable the rule. Ending like this:~~ 
-    ```Csharp
-    enum ProcessError
-    {
-        FailureA,
-        FailureB
-    }
-
-    Result<Unit, ProcessError> DoProcess() { ... }
-
-    public void Run() 
-    {
-        var result = DoProcess();
-
-        result.Match(_ => Console.WriteLine("Success"),
-        #pragma warning disable CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
-        err => err switch
-        {
-            ProcessError.FailureA => Console.WriteLine("FailureA"),
-            ProcessError.FailureB => Console.WriteLine("FailureB"),
-        });
-        #pragma warning restore CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
-    }
-    ```
-
-    **I'm happy with this one too.** 
-
-    By using the `Union` class you are forced to deal with all the cases without modifying all the methods that use this class. Better result than what I expected.

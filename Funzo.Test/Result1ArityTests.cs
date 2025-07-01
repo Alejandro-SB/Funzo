@@ -8,14 +8,14 @@ public class Result1ArityTests
     public void Ok_Creates_A_Successful_Operation_Result()
     {
         var instance = Result<int>.Ok();
-        instance.EnsureOk();
+        instance.EnsureOk("Should not fail");
     }
 
     [Fact]
     public void Error_Creates_A_Failed_Operation_Result()
     {
         var instance = Result<int>.Err(7);
-        Assert.Throws<ArgumentException>(() => instance.EnsureOk());
+        Assert.Throws<ArgumentException>(() => instance.EnsureOk("Should fail"));
     }
 
     [Fact]
@@ -204,7 +204,7 @@ public class Result1ArityTests
 
         var isOk = option.IsSome(out var value);
 
-        Assert.Equal(Option<Unit>.None(), value);
+        Assert.Equal(Option<Unit>.None, value);
         Assert.False(isOk);
     }
 

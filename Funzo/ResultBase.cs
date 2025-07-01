@@ -161,7 +161,7 @@ public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>, IEqua
     /// Converts the result into a <see cref="Option{TOk}"/>
     /// </summary>
     /// <returns><see cref="Option.Some{TOk}(TOk)" /> if the result is successful, <see cref="Option{TOk}.None"/> otherwise</returns>
-    public Option<TOk> AsOk() => IsOk ? Option.Some(OkValue!) : Option<TOk>.None();
+    public Option<TOk> AsOk() => IsOk ? Option.Some(OkValue!) : Option<TOk>.None;
 
     /// <summary>
     /// Returns a new <see cref="Result{T, TErr}"/> with the value corresponding to <typeparamref name="TOk"/> transformed
@@ -322,11 +322,11 @@ public abstract class ResultBase<TResult, TErr> : IResult<TErr>, IEquatable<Resu
     /// Ensures that this instance is an Ok value. This method should be avoided whenever possible in favour of <see cref="IsErr(out TErr?)"></see>
     /// </summary>
     /// <exception cref="ArgumentException">Thrown if this instance is not in an Ok state</exception>
-    public void EnsureOk()
+    public void EnsureOk(string? errorMessage)
     {
         if (!IsOk)
         {
-            throw new ArgumentException("Result is not in OK state");
+            throw new ArgumentException(errorMessage ?? "Result is not in OK state");
         }
     }
 
@@ -334,7 +334,7 @@ public abstract class ResultBase<TResult, TErr> : IResult<TErr>, IEquatable<Resu
     /// Returns an <see cref="Option{T}"/> with a Some value if result is in an Ok state, None otherwise
     /// </summary>
     /// <returns>This result as an option</returns>
-    public Option<Unit> AsOk() => IsOk ? Option<Unit>.Some(Unit.Default) : Option<Unit>.None();
+    public Option<Unit> AsOk() => IsOk ? Option<Unit>.Some(Unit.Default) : Option<Unit>.None;
 
     /// <summary>
     /// Returns a new <see cref="Result{T, TErr}"/> with a new return value for the Ok state

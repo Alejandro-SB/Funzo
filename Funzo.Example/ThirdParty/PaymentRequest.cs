@@ -2,7 +2,7 @@
 
 public record PaymentRequest(string DestinationAccountId, decimal Amount)
 {
-    public Option<DateTimeOffset> EffectiveDate { get; set; } = Option<DateTimeOffset>.None();
+    public Option<DateTimeOffset> EffectiveDate { get; set; }
 }
 
 [Union]

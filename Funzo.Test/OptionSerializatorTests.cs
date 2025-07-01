@@ -39,7 +39,7 @@ public class OptionSerializatorTests
     public void String_Serializer_Serializes_Correctly_When_Has_None()
     {
         var expected = @$"{{""HasValue"":false}}";
-        var option = Option<string>.None();
+        var option = Option<string>.None;
 
         var converter = _optionConverterFactory.CreateConverter(option.GetType(), JsonSerializerOptions.Default)!;
 

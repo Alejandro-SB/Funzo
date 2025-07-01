@@ -20,9 +20,9 @@ public class OptionTests
     [Fact]
     public void None_Creates_Empty_Instance()
     {
-        var instance = Option<int>.None();
+        var instance = Option<int>.None;
 
-        Assert.Equal(Option<int>.None(), instance);
+        Assert.Equal(Option<int>.None, instance);
     }
 
     [Theory]
@@ -42,11 +42,11 @@ public class OptionTests
     [Fact]
     public void Map_Omits_Function_When_Option_Has_No_Value()
     {
-        var instance = Option<int>.None();
+        var instance = Option<int>.None;
 
         var result = instance.Map(MapOperation);
 
-        Assert.Equal(Option<int>.None(), result);
+        Assert.Equal(Option<int>.None, result);
     }
 
     [Theory]
@@ -66,10 +66,10 @@ public class OptionTests
     [Fact]
     public void Bind_Omits_Function_When_Option_Has_No_Value()
     {
-        var instance = Option<int>.None();
+        var instance = Option<int>.None;
         var result = instance.Map(BindOperation);
 
-        Assert.Equal(Option<int>.None(), result);
+        Assert.Equal(Option<int>.None, result);
     }
 
     [Theory]
@@ -94,7 +94,7 @@ public class OptionTests
     [InlineData(-100)]
     public void Match_Executes_None_Function_When_Option_Has_No_Value(int value)
     {
-        var instance = Option<int>.None();
+        var instance = Option<int>.None;
 
         var result = instance.Match(Throw<int, int>("Match should not execute Some case"), () => value);
 
@@ -115,7 +115,7 @@ public class OptionTests
     public void ValueOr_Returns_Fallback_Value_When_Option_Has_No_Value()
     {
         var expected = 7;
-        var instance = Option<int>.None();
+        var instance = Option<int>.None;
         var result = instance.ValueOr(expected);
 
         Assert.Equal(expected, result);
@@ -131,7 +131,7 @@ public class OptionTests
         var instance = Option.FromValue(value);
         var expected = value is { } v
             ? Option.Some(v)
-            : Option<int>.None();
+            : Option<int>.None;
 
         Assert.Equal(expected, instance);
     }
@@ -145,7 +145,7 @@ public class OptionTests
         var instance = Option.FromValue(value);
         var expected = value is not null
             ? Option.Some(value)
-            : Option<string>.None();
+            : Option<string>.None;
 
         Assert.Equal(expected, instance);
     }
@@ -186,7 +186,7 @@ public class OptionTests
     [Fact]
     public void IsSome_Returns_False_When_There_Is_No_Value()
     {
-        var none = Option<int>.None();
+        var none = Option<int>.None;
 
         Assert.False(none.IsSome(out _));
     }
@@ -230,7 +230,7 @@ public class OptionTests
     [Fact]
     public void Inspect_Is_Not_Called_When_Value_Is_None()
     {
-        var value = Option<int>.None();
+        var value = Option<int>.None;
         static void throwF(int _) => throw new Exception();
 
         value.Inspect(throwF);
@@ -239,7 +239,7 @@ public class OptionTests
     [Fact]
     public async Task Inspect_Is_Not_Called_Async_When_Value_Is_None()
     {
-        var value = Option<int>.None();
+        var value = Option<int>.None;
         static Task throwF(int _) => throw new Exception();
 
         await value.InspectAsync(throwF);
@@ -260,7 +260,7 @@ public class OptionTests
     [Fact]
     public void ValueOrDefault_Returns_Default_When_None()
     {
-        var none = Option<string>.None();
+        var none = Option<string>.None;
 
         var result = none.ValueOrDefault();
 
@@ -281,7 +281,7 @@ public class OptionTests
     [Fact]
     public void Unwrap_Throws_If_Option_Is_None()
     {
-        var option = Option<int>.None();
+        var option = Option<int>.None;
 
         Assert.Throws<NullReferenceException>(() => option.Unwrap());
     }
