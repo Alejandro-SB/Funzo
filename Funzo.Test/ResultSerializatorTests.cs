@@ -1,4 +1,5 @@
 ﻿using Funzo.Serialization;
+using System;
 using System.Text.Json;
 
 namespace Funzo.Test;
@@ -75,4 +76,88 @@ public class ResultSerializatorTests
         Assert.False(isErr);
         Assert.Equal(number, ok);
     }
+
+    [Fact]
+    public void Result_Serializes_Deserializes_Custom_Result()
+    {
+        var text = @$"{{""IsOk"":true,""Ok"":1}}";
+
+        var converter = _resultConverterFactory.CreateConverter(typeof(CustomResult), JsonSerializerOptions.Default)!;
+
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(converter);
+
+        var result = JsonSerializer.Deserialize<CustomResult>(text, options);
+
+        Assert.NotNull(result);
+
+        var isOk = !result.IsErr(out var ok, out _);
+
+        Assert.True(isOk);
+        Assert.Equal(1, ok);
+    }
+
+    [Fact]
+    public void Result_Serializer_Deserializes_Simple_Result()
+    {
+        var text = @$"{{""IsOk"":false,""Err"":""error""}}";
+
+        var converter = _resultConverterFactory.CreateConverter(typeof(CustomSimpleResult), JsonSerializerOptions.Default)!;
+
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(converter);
+
+        var result = JsonSerializer.Deserialize<CustomSimpleResult>(text, options);
+
+        Assert.NotNull(result);
+
+        var isErr = result.IsErr(out var oerr);
+
+        Assert.True(isErr);
+        Assert.Equal("error", oerr);
+    }
+
+    [Fact]
+    public void Result_Serializer_Deserializes_Simple_Result_Ok()
+    {
+        var text = @$"{{""IsOk"":true,""Ok"":""""}}";
+
+        var simpleConverter = _resultConverterFactory.CreateConverter(typeof(CustomSimpleResult), JsonSerializerOptions.Default)!;
+        var customConverter = _resultConverterFactory.CreateConverter(typeof(CustomResult), JsonSerializerOptions.Default)!;
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(simpleConverter);
+        options.Converters.Add(new UnitJsonConverter());
+        options.Converters.Add(customConverter);
+
+        var result = JsonSerializer.Deserialize<CustomSimpleResult>(text, options);
+
+        Assert.NotNull(result);
+
+        var isErr = result.IsErr(out var oerr);
+
+        Assert.False(isErr);
+
+
+        CustomResult crOk = 1;
+        CustomResult crErr = "none";
+
+        var csrOk = CustomSimpleResult.Ok();
+        var csrErr = CustomSimpleResult.Err("FAIL");
+
+        var ser1 = JsonSerializer.Serialize(crOk, options);
+        var ser2 = JsonSerializer.Serialize(crErr, options);
+        var ser3 = JsonSerializer.Serialize(csrOk, options);
+        var ser4 = JsonSerializer.Serialize(csrErr, options);
+
+        Console.WriteLine(ser1);
+        Console.WriteLine(ser2);
+        Console.WriteLine(ser3);
+        Console.WriteLine(ser4);
+    }
 }
+
+[Result]
+public partial class CustomResult : IResult<int, string>;
+
+[Result]
+public partial class CustomSimpleResult : IResult<string>;
