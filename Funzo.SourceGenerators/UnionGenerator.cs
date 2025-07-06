@@ -113,6 +113,14 @@ namespace {AttributeNamespace}
             }
         }
 
+        var typeArgLookup = typeArguments.ToLookup(x => x, SymbolEqualityComparer.Default);
+
+        if(typeArgLookup.Any(a => a.Count() > 1))
+        {
+            CreateDiagnosticError(FunzoDiagnosticDescriptors.Union.RepeatedTypeSymbols);
+            return null;
+        }
+
         return GenerateClassSource(classSymbol, typeArguments);
 
         void CreateDiagnosticError(DiagnosticDescriptor descriptor)
