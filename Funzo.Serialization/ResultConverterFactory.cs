@@ -24,7 +24,7 @@ public class ResultConverterFactory : JsonConverterFactory
         var errType = genericTypes[1];
         var converter = (JsonConverter)Activator.CreateInstance(
                 typeof(ResultConverter<,>)
-            .MakeGenericType(new[] { okType, errType }))!;
+            .MakeGenericType([okType, errType]))!;
 
         return converter;
     }
