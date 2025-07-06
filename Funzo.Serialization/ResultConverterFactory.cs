@@ -24,11 +24,9 @@ public class ResultConverterFactory : JsonConverterFactory
     /// <inheritdoc />
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
-        //Debug.Assert(typeToConvert.IsGenericType &&
-        //        typeToConvert.GetGenericTypeDefinition() == typeof(Result<,>));
+        Debug.Assert(CanConvert(typeToConvert));
 
         var baseType = typeToConvert.BaseType!;
-        Debug.Assert(ResultTypes.Contains(baseType.GetGenericTypeDefinition()));
 
         var genericTypes = baseType.GetGenericArguments();
 
@@ -61,6 +59,7 @@ public class ResultConverterFactory : JsonConverterFactory
 /// <summary>
 /// JsonConverter for <see cref="Result{TOk, TErr}"/>
 /// </summary>
+/// <typeparam name="TResult"></typeparam>
 /// <typeparam name="TOk"></typeparam>
 /// <typeparam name="TErr"></typeparam>
 public class ResultConverter<TResult, TOk, TErr> : JsonConverter<TResult>
@@ -119,7 +118,7 @@ public class ResultConverter<TResult, TOk, TErr> : JsonConverter<TResult>
 /// <summary>
 /// JsonConverter for <see cref="Result{TOk, TErr}"/>
 /// </summary>
-/// <typeparam name="TOk"></typeparam>
+/// <typeparam name="TResult"></typeparam>
 /// <typeparam name="TErr"></typeparam>
 public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
     where TResult : ResultBase<TResult, TErr>, IResultBase<TResult, TErr>
@@ -135,7 +134,7 @@ public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
         var deserializedValue = JsonSerializer.Deserialize<ResultRepresentation<Unit, TErr>>(ref reader, options) ?? throw new JsonException();
 
         return deserializedValue.IsOk
-            ? ProduceOk(default)
+            ? ProduceOk()
             : ProduceErr(deserializedValue.Err!);
     }
 
@@ -163,7 +162,7 @@ public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
 #endif
     }
 
-    private TResult ProduceOk(Unit ok)
+    private TResult ProduceOk()
     {
 #if NET6_0_OR_GREATER
         return TResult.Ok();

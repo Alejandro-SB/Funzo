@@ -19,7 +19,7 @@ public class ResultSerializatorTests
 
         var serialized = JsonSerializer.Serialize(result, options);
         var expected = $@"{{""IsOk"":true,""Ok"":{num}}}";
-        
+
         Assert.Equal(expected, serialized);
     }
 
@@ -49,7 +49,7 @@ public class ResultSerializatorTests
         options.Converters.Add(converter);
 
         var serialized = $@"{{""IsOk"":false,""Err"":""{text}""}}";
-        var result = JsonSerializer.Deserialize<Result<int,string>>(serialized, options);
+        var result = JsonSerializer.Deserialize<Result<int, string>>(serialized, options);
 
         Assert.NotNull(result);
         var isErr = result.IsErr(out var ok, out var err);
@@ -137,22 +137,21 @@ public class ResultSerializatorTests
 
         Assert.False(isErr);
 
-
         CustomResult crOk = 1;
         CustomResult crErr = "none";
 
         var csrOk = CustomSimpleResult.Ok();
         var csrErr = CustomSimpleResult.Err("FAIL");
 
-        var ser1 = JsonSerializer.Serialize(crOk, options);
-        var ser2 = JsonSerializer.Serialize(crErr, options);
-        var ser3 = JsonSerializer.Serialize(csrOk, options);
-        var ser4 = JsonSerializer.Serialize(csrErr, options);
+        var serializedCustomOk = JsonSerializer.Serialize(crOk, options);
+        var serializedCustomErr = JsonSerializer.Serialize(crErr, options);
+        var serializedSimpleOk = JsonSerializer.Serialize(csrOk, options);
+        var serializedSimpleErr = JsonSerializer.Serialize(csrErr, options);
 
-        Console.WriteLine(ser1);
-        Console.WriteLine(ser2);
-        Console.WriteLine(ser3);
-        Console.WriteLine(ser4);
+        Assert.Equal($@"{{""IsOk"":true,""Ok"":1}}", serializedCustomOk);
+        Assert.Equal($@"{{""IsOk"":false,""Err"":""none""}}", serializedCustomErr);
+        Assert.Equal($@"{{""IsOk"":true,""Ok"":""""}}", serializedSimpleOk);
+        Assert.Equal($@"{{""IsOk"":false,""Err"":""FAIL""}}", serializedSimpleErr);
     }
 }
 
