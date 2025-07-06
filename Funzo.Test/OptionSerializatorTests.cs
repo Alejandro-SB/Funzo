@@ -102,7 +102,6 @@ public class OptionSerializatorTests
             Date = date
         };
 
-        Assert.NotNull(result);
         var isSome = result.IsSome(out var innerOption);
         Assert.True(isSome);
         Assert.Equal(expected, innerOption);
@@ -119,8 +118,6 @@ public class OptionSerializatorTests
         serializerOptions.Converters.Add(converter);
 
         var option = JsonSerializer.Deserialize<Option<ComplexClass>>(text, serializerOptions);
-
-        Assert.NotNull(option);
 
         var isSome = option.IsSome(out var innerValue);
 
