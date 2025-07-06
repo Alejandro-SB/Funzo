@@ -22,7 +22,7 @@ public class OptionConverterFactory : JsonConverterFactory
         var elementType = typeToConvert.GetGenericArguments()[0];
         var converter = (JsonConverter)Activator.CreateInstance(
                 typeof(OptionConverter<>)
-            .MakeGenericType(new[] { elementType }))!;
+            .MakeGenericType([elementType]))!;
 
         return converter;
     }

@@ -53,10 +53,18 @@ internal static class FunzoDiagnosticDescriptors
                 true);
 
         public static DiagnosticDescriptor InterfaceNotValidType
-            => new("FNZ0007", "user-defined conversions to or from an interface are not allowed",
-                "user-defined conversions to or from an interface are not allowed",
+            => new("FNZ0007", "User-defined conversions to or from an interface are not allowed",
+                "User-defined conversions to or from an interface are not allowed",
                 "UnionGenerator",
                 DiagnosticSeverity.Error,
                 true);
+
+        public static DiagnosticDescriptor RepeatedTypeSymbols
+            => new("FNZ0008", "Cannot use the same type twice in a union",
+                "Cannot use the same type twice in a union",
+                "UnionGenerator",
+                DiagnosticSeverity.Error,
+                true,
+                "Type is used to manage unions. If you need to use the same type twice, use a wrapper type around what you need");
     }
 }

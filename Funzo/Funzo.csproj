@@ -31,4 +31,8 @@
 	  </None>
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="Funzo.Serialization" />
+	</ItemGroup>
+
 </Project>

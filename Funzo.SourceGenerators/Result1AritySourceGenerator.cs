@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace Funzo.SourceGenerators;
 internal class Result1AritySourceGenerator : ResultSourceGenerator
@@ -20,7 +21,23 @@ internal class Result1AritySourceGenerator : ResultSourceGenerator
 
     internal override string OkImplicitConverter => string.Empty;
 
-    internal override string ErrImplicitConverter => $@"public static implicit operator {ClassNameWithGenerics}({ErrDisplayName} _) => new {ClassNameWithGenerics}(_);";
+    internal override string ErrImplicitConverter
+    {
+        get
+        {
+            var implicitConversions = new StringBuilder();
+            implicitConversions.AppendLine($@"public static implicit operator {ClassNameWithGenerics}({ErrDisplayName} _) => new {ClassNameWithGenerics}(_);");
 
-    private string ErrDisplayName => TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            if (TryGetImplicitConvertersForUnionType(ErrType, ResultParameterType.Err, out var converters))
+            {
+                implicitConversions.AppendLine(converters);
+            }
+
+            return implicitConversions.ToString();
+        }
+    }
+
+    private string ErrDisplayName => ErrType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+    private ITypeSymbol ErrType => TypeArguments[0];
 }
