@@ -1,3 +1,5 @@
+using System;
+
 namespace Funzo.SourceGenerators.Test;
 
 public class ResultGeneratorTests
@@ -31,9 +33,54 @@ public class ResultGeneratorTests
         Assert.False(ok.IsErr(out _));
         Assert.True(fail.IsErr(out _));
     }
+
+    [Fact]
+    public void Can_Implicitly_Convert_From_Union_In_Generic_To_Type()
+    {
+        static TwoUnionResult process(int value)
+        {
+            return value switch
+            {
+                1 => new ArgumentError(),
+                2 => new InvalidError(),
+                3 => new UnknownError(),
+                4 => 4,
+                5 => "STRING"
+            };
+        }
+
+        var err = process(1);
+
+        var isErr = err.IsErr(out var e);
+
+        Assert.True(isErr);
+
+        e!.Switch(a => { }, b => throw new Exception("Should not reach"), c => throw new Exception("Should not reach"));
+
+        var ok = process(4);
+
+        var isOk = !ok.IsErr(out var o, out _);
+
+        Assert.True(isOk);
+    }
 }
 
 [Result]
 public partial class TestResult : IResult<Unit, string>;
 [Result]
 public partial class TestUnitResult : IResult<string>;
+
+[Union]
+public partial class MyOk : Union<int, string>;
+
+[Result]
+public partial class TwoUnionResult : IResult<MyOk, MyError>;
+
+[Union]
+public partial class ClonedErr : Union<string, int>;
+
+[Union]
+public partial class ClonedOk : Union<string, int>;
+
+[Result]
+public partial class CheapClone : IResult<ClonedOk, ClonedErr>;

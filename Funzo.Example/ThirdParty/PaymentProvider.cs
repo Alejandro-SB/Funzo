@@ -11,7 +11,7 @@ public class PaymentProvider
     {
         if (!_validAccounts.Contains(paymentRequest.DestinationAccountId))
         {
-            return SendPaymentResult.Err(new InvalidAccountError(paymentRequest.DestinationAccountId));
+            return new InvalidAccountError(paymentRequest.DestinationAccountId);
         }
 
         if (_balance < paymentRequest.Amount)
