@@ -3,23 +3,6 @@
 /// <summary>
 /// Represents the result of an operation
 /// </summary>
-/// <typeparam name="TOk">The type of the Ok value</typeparam>
-/// <typeparam name="TErr">The type of the Error value</typeparam>
-public interface IResult<TOk, TErr>
-{
-}
-
-/// <summary>
-/// Represents the result of an operation
-/// </summary>
-/// <typeparam name="TErr">The type of the Error value</typeparam>
-public interface IResult<TErr>
-{
-}
-
-/// <summary>
-/// Represents the result of an operation
-/// </summary>
 /// <typeparam name="TResult">The type of the Result instance</typeparam>
 /// <typeparam name="TOk">The type of the Ok value</typeparam>
 /// <typeparam name="TErr">The type of the Error value</typeparam>

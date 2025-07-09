@@ -42,10 +42,9 @@ public class ResultGeneratorTests
             return value switch
             {
                 1 => new ArgumentError(),
-                2 => new InvalidError(),
-                3 => new UnknownError(),
                 4 => 4,
-                5 => "STRING"
+
+                _ => throw new InvalidOperationException()
             };
         }
 
@@ -65,22 +64,22 @@ public class ResultGeneratorTests
     }
 }
 
-[Result]
-public partial class TestResult : IResult<Unit, string>;
-[Result]
-public partial class TestUnitResult : IResult<string>;
+[Result<Unit, string>]
+public partial class TestResult;
+[Result<string>]
+public partial class TestUnitResult;
 
-[Union]
-public partial class MyOk : Union<int, string>;
+[Union<int, string>]
+public partial class MyOk ;
 
-[Result]
-public partial class TwoUnionResult : IResult<MyOk, MyError>;
+[Result<MyOk, MyError>]
+public partial class TwoUnionResult;
 
-[Union]
-public partial class ClonedErr : Union<string, int>;
+[Union<string, int>]
+public partial class ClonedErr;
 
-[Union]
-public partial class ClonedOk : Union<string, int>;
+[Union<string, int>]
+public partial class ClonedOk;
 
-[Result]
-public partial class CheapClone : IResult<ClonedOk, ClonedErr>;
+[Result<ClonedOk, ClonedErr>]
+public partial class CheapClone;

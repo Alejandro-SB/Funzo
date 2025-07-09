@@ -5,8 +5,8 @@ public record PaymentRequest(string DestinationAccountId, decimal Amount)
     public Option<DateTimeOffset> EffectiveDate { get; set; }
 }
 
-[Union]
-public partial class PaymentError : Union<InvalidAccountError, InsufficientFundsError, InvalidEffectiveDateError>;
+[Union<InvalidAccountError, InsufficientFundsError, InvalidEffectiveDateError>]
+public partial class PaymentError;
 
 public record InvalidAccountError(string AccountId);
 public record InsufficientFundsError(decimal CurrentFunds);
