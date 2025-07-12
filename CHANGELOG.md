@@ -1,5 +1,70 @@
 # CHANGELOG
 
+## 3.1.0
+- Now source generators don't need to inherit/implement interfaces. Using generic attributes types can be provided, avoiding innecesary clutter. This requires [C#11](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/reflection-and-attributes/generics-and-attributes)
+- Added Union serialization. It serializes to a property with the name of the property being the name of the type. Check README for some examples.
+- Union types now expose public shared properties so there is no need to Match. For Example:
+```Csharp
+public record User(int Id, string Name);
+public record Admin(int Id, string Name, Permission[] Permissions);
+public record SuperAdmin(int Id);
+
+[Union<User, Admin, SuperAdmin>]
+public partial class AppUser;
+```
+Will make `AppUser` have an `Id` property exposed (readonly);
+- Added implicit conversions for unions when inside a Result. Now, you can do something like this:
+```Csharp
+
+public async Task<CreateUserResult> CreateUser(string username, string password)
+{
+	/// This could return a Result<IEnumerable<string>> with errors
+	var isValidUsernameResult = _userNameValidator.IsValid(username);
+
+	if (isValidUsernameResult.IsErr(out var errors)
+	{
+	    return new InvalidUsername(errors);
+	}
+
+	var existsUser = await _context.Users.AnyAsync(u => u.Username == username);
+
+	if (existsUser)
+	{
+		return new UsernameAlreadyExists(username);
+	}
+
+	var passwordEncryptionResult = _passwordEncryptionService.TryHashPassword(password);
+
+	if (passwordEncryptionResult.IsErr(out var hashedPassword, out var errors))
+	{
+		return new PasswordNotStrongEnough(errors);
+	}
+
+	var user = new User
+	{
+		Username = username,
+		Password = hashedPassword
+	};
+
+	_context.Users.Add(user);
+
+	await _context.SaveChangesAsync();
+
+	return user.Id;
+}
+
+
+[Result<UserId, UserCreationError>]
+public partial class CreateUserResult;
+
+[Union<InvalidUsername, UsernameAlreadyExists, PasswordNotStrongEnough>]
+public partial class UserCreationError;
+
+public record InvalidUsername(IEnumerable<string> RuleErrors);
+public record UsernameAlreadyExists(string Username);
+public record PasswordNotStrongEnough(IEnumerable<string> Rules);
+```
+
 ## 3.0.0
 Big refactor of the whole codebase to provide better DX
 ### `Option<T>`
@@ -39,7 +104,7 @@ New class that lets you map exceptions to results.
 ## Source generators
 Now `Results` have to be marked with the `IResult` interface instead of inheriting from a `Result` class.
 ```csharp
-[Result]
+[Result<int,string>]
 public class MyResult : IResult<int, string>;
 ```
 Also, generators have been split so the code generated for `IResult<TOk, TErr>` and `IResult<TErr>` is more explicit (no more carrying `Unit` around).
