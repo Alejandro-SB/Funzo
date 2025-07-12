@@ -41,22 +41,22 @@ _Funzo_ allows the developer to use some classes more commonly used in functiona
 ## Usage (recommended way)
 The best way to approach this package is through source generators. This will allow you to define your types with ease and work on your problems straight away.
 You will need the `Funzo` and `Funzo.SourceGenerators` packages.
-For unions, inherit from the `Union` class and decorate it with the `Union` attribute.
-For results, implement the interface `IResult<TOk, TErr>` or `IResult<TErr>` and decorate it with the attribute `Result`.
+For unions, decorate it with the `Union` attribute, supplying the generic parameters you want as possible options.
+For results, decorate it with the attribute `Result`, using generics for the Error and Ok variant, if needed.
 In both cases, the class should be partial so new code can be generated.
 
 ```Csharp
-[Union]
-public partial class ApiError : Union<Error1, Error2, Error3>;
+[Union<Error1, Error2, Error3>]
+public partial class ApiError;
 
-[Result]
-public partial class ApiCallResult : IResult<ApiError>;
+[Result<ApiError>]
+public partial class ApiCallResult;
 
-[Union]
-public partial class ItemCreationError : Union<ItemWithNameAlreadyExists, InvalidItemName, EmptyItemName>;
+[Union<ItemWithNameAlreadyExists, InvalidItemName, EmptyItemName>]
+public partial class ItemCreationError;
 
-[Result]
-public partial class ItemCreatedResult : IResult<ItemId, ItemCreationError>;
+[Result<ItemId, ItemCreationError>]
+public partial class ItemCreatedResult;
 ```
 
 
@@ -207,7 +207,7 @@ public async IResult Post([FromBody] UserPayload payload)
         });
 ```
 
-Same as `Option`, we have 2 new methods: `Inspect` and `InspectErr` (and their async variants) in case you want to do something with the values without actually changing anything.
+Same as `Option`, we have 2 methods: `Inspect` and `InspectErr` (and their async variants) in case you want to do something with the values without actually changing anything.
 
 ### ResultBuilder
 Created by using the static method `For`, lets you map different exceptions to errors, allowing you to migrate from an exception based approach to a result based approach.
@@ -260,11 +260,11 @@ public async Task Main()
         .TryAsync(async () => await ReserveTable(userId, reservationDate));
 }
 
-[Result]
-public partial class ReservationResult : IResult<int, ReservationError>;
+[Result<int, ReservationError>]
+public partial class ReservationResult;
 
-[Union]
-public partial class ReservationError : Union<RestaurantClosed, RoomFullError, UnknownError>;
+[Union<RestaurantClosed, RoomFullError, UnknownError>]
+public partial class ReservationError;
 ```
 
 In this way, you can refactor safely and remove exceptions one by one, making all your methods explicit about how they can fail so the developer can handle it.
@@ -320,18 +320,22 @@ or
 { "IsOk": false, "Err": *whatever* }
 ```
 
+`Union` serializes as a property, with the name of the property taking the value of the type used:
+```chsarp
+[Union<int, string, DateTime>]
+public partial class MyUnion ;
+
+public class MyClass
+{
+    public MyUnion Union { get; set; } = new MyUnion(DateTime.UtcNow);
+}
+```
+```JSON
+{"Union":{"DateTime":"2025-07-12T13:34:57.6941483Z"}}
+```
+
 ## Example
 There is a working example of a payment system under `Funzo.Example`. Feel free to take a look at how the code will look after using it.
-
-## Further work
-- [ ] Create a serializer for union types. At the moment, there is nothing planned, as I'm not sure if I should just serialize it to whatever object it is or do something like:
-    ```JSON
-    {
-        "type": "Item1",
-        "data": ...
-    }
-    ```
-- [ ] Provide more methods to work with unions. They hold the most complexity, so they should provide the maximum flexibility possible without losing type safety.
 
 ## Design philosophy
 The idea behind this small package was to provide `Option`/`Result` monads that work idiomatically with C#, whithout losing the essence of them.
