@@ -102,13 +102,6 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     public T? ValueOrDefault() => _hasValue ? _value! : default;
 
     /// <summary>
-    /// Returns the value if exists or throws a <see cref="NullReferenceException"/>. This method should be avoided whenever possible in favour of <see cref="IsSome(out T)"/>
-    /// </summary>
-    /// <returns>The value of the option</returns>
-    /// <exception cref="NullReferenceException"></exception>
-    public T Unwrap() => _hasValue ? _value! : throw new NullReferenceException();
-
-    /// <summary>
     /// Returns <see langword="true" /> and assigns <paramref name="value"/> when it has value, <see langword="false"/> otherwise.
     /// </summary>
     /// <param name="value">The value contained in this instance, or <see langword="default"/> if no value present</param>
@@ -254,14 +247,4 @@ public static class Option
     /// <returns>A new task wrapping the operation</returns>
     public static Task<T> ValueOr<T>(this Task<Option<T>> task, T value)
         => task.Then(t => t.ValueOr(value));
-
-    /// <summary>
-    /// Creates a continuation of the current task that will return the inner value inside <see cref="Option{T}"/> or throw if none
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="task">The task to attach the continuation to</param>
-    /// <returns>The value of the <see cref="Option{T}"/> or throws</returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    public static Task<T> Unwrap<T>(this Task<Option<T>> task)
-        => task.Then(t => t.Unwrap());
 }

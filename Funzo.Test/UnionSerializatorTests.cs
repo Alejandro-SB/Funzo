@@ -56,5 +56,5 @@ public class UnionSerializatorTests
     }
 }
 
-[Union]
-public partial class MyUnion : Union<int, string, DateTime>;
+[Union<int, string, DateTime>]
+public partial class MyUnion ;

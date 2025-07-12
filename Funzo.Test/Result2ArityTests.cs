@@ -201,25 +201,6 @@ public class Result2ArityTests
     }
 
     [Fact]
-    public void Unwrap_Returns_Ok_Value_When_Ok()
-    {
-        var expected = 1;
-        var result = Result<int, string>.Ok(expected);
-
-        var returned = result.Unwrap();
-
-        Assert.Equal(expected, returned);
-    }
-
-    [Fact]
-    public void Unwrap_Throws_When_Err()
-    {
-        var result = Result<int, string>.Err("FAIL");
-
-        Assert.Throws<ArgumentException>(() => result.Unwrap());
-    }
-
-    [Fact]
     public void AsOk_Returns_Option_With_Ok_Value()
     {
         var expected = 3;

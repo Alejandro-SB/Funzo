@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Funzo;
+namespace Funzo.SourceGenerators.Helpers;
 internal static class FunzoDiagnosticDescriptors
 {
     public static class Result
@@ -14,8 +14,8 @@ internal static class FunzoDiagnosticDescriptors
                 true);
 
         public static DiagnosticDescriptor WrongBaseType
-            => new("FNZ0002", "Result must be marked with interface IResult",
-                "Class '{0}' should be marked with IResult",
+            => new("FNZ0002", "Result should not have a base class",
+                "Class '{0}' should not have any base class",
                 "ResultGenerator",
                 DiagnosticSeverity.Error,
                 true);
@@ -34,14 +34,14 @@ internal static class FunzoDiagnosticDescriptors
             => new("FNZ0004",
                 "Class must be top level",
                 "Class '{0}' using UnionGenerator must be top level",
-                "ResultGenerator",
+                "UnionGenerator",
                 DiagnosticSeverity.Error,
                 true);
 
         public static DiagnosticDescriptor WrongBaseType
-            => new("FNZ0005", "Unions must inherit from Union",
-                "Class '{0}' should inherit from Union",
-                "ResultGenerator",
+            => new("FNZ0005", "Unions should not have a base class",
+                "Class '{0}' should not have a base class",
+                "UnionGenerator",
                 DiagnosticSeverity.Error,
                 true);
 

@@ -12,8 +12,9 @@ public class OptionTests
     {
         var instance = Option.Some(value);
 
-        var instanceValue = instance.Unwrap();
+        var isSome = instance.IsSome(out var instanceValue);
 
+        Assert.True(isSome);
         Assert.Equal(value, instanceValue);
     }
 
@@ -265,25 +266,6 @@ public class OptionTests
         var result = none.ValueOrDefault();
 
         Assert.Null(result);
-    }
-
-    [Fact]
-    public void Unwrap_Returns_Value_When_Its_Some()
-    {
-        var expected = 3;
-        var option = Option.FromValue<int>(expected);
-
-        var result = option.Unwrap();
-
-        Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public void Unwrap_Throws_If_Option_Is_None()
-    {
-        var option = Option<int>.None;
-
-        Assert.Throws<NullReferenceException>(() => option.Unwrap());
     }
 
     private static int MapOperation(int v) => v + 1;

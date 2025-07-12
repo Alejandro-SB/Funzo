@@ -1,31 +1,32 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Funzo.SourceGenerators.Helpers;
+using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
-namespace Funzo.SourceGenerators;
-internal class Result2AritySourceGenerator : ResultSourceGenerator
+namespace Funzo.SourceGenerators.Generators.Results;
+internal class Result2AritySourceGenerator : ResultGenerator
 {
-    internal Result2AritySourceGenerator(INamedTypeSymbol classSymbol, ImmutableArray<ITypeSymbol> typeArguments) : base(classSymbol, typeArguments)
+    internal Result2AritySourceGenerator(SymbolWithAttribute symbolWithAttribute) : base(symbolWithAttribute)
     {
     }
 
-    internal override string ClassDefinition => $@"partial class {ClassNameWithGenerics} : ResultBase<{ClassSymbol.Name}, {OkDisplayName},{ErrDisplayName}>, IResultBase<{ClassSymbol.Name}, {OkDisplayName},{ErrDisplayName}>";
+    internal override string ClassDefinition => $@"partial class {ClassName} : ResultBase<{ClassName}, {OkDisplayName},{ErrDisplayName}>, IResultBase<{ClassName}, {OkDisplayName},{ErrDisplayName}>";
 
-    internal override string OkConstructor => @$"protected {ClassSymbol.Name}({OkDisplayName} _) : base(_) {{}}";
+    internal override string OkConstructor => @$"protected {ClassName}({OkDisplayName} _) : base(_) {{}}";
 
-    internal override string ErrConstructor => $@"protected {ClassSymbol.Name}({ErrDisplayName} _) : base(_) {{}}";
+    internal override string ErrConstructor => $@"protected {ClassName}({ErrDisplayName} _) : base(_) {{}}";
 
-    internal override string OkStaticHelper => $@"public static {ClassNameWithGenerics} Ok({OkDisplayName} ok) => new(ok);";
+    internal override string OkStaticHelper => $@"public static {ClassName} Ok({OkDisplayName} ok) => new(ok);";
 
-    internal override string ErrStaticHelper => $@"public static {ClassNameWithGenerics} Err({ErrDisplayName} err) => new(err);";
+    internal override string ErrStaticHelper => $@"public static {ClassName} Err({ErrDisplayName} err) => new(err);";
 
     internal override string OkImplicitConverter
     {
         get
         {
             var implicitConversions = new StringBuilder();
-            implicitConversions.AppendLine($@"public static implicit operator {ClassNameWithGenerics}({OkDisplayName} _) => new {ClassNameWithGenerics}(_);");
+            implicitConversions.AppendLine($@"public static implicit operator {ClassName}({OkDisplayName} _) => new {ClassName}(_);");
 
             if (!HasCollidingParameters() && TryGetImplicitConvertersForUnionType(OkType, ResultParameterType.Ok, out var converters))
             {
@@ -41,7 +42,7 @@ internal class Result2AritySourceGenerator : ResultSourceGenerator
         get
         {
             var implicitConversions = new StringBuilder();
-            implicitConversions.AppendLine($@"public static implicit operator {ClassNameWithGenerics}({ErrDisplayName} _) => new {ClassNameWithGenerics}(_);");
+            implicitConversions.AppendLine($@"public static implicit operator {ClassName}({ErrDisplayName} _) => new {ClassName}(_);");
 
             if (!HasCollidingParameters() && TryGetImplicitConvertersForUnionType(ErrType, ResultParameterType.Err, out var converters))
             {

@@ -7,7 +7,7 @@ namespace Funzo;
 /// <typeparam name="TOk">Type of the Ok value</typeparam>
 /// <typeparam name="TErr">Type of the Error value</typeparam>
 /// <typeparam name="TResult">Type of the result</typeparam>
-public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>, IEquatable<ResultBase<TResult, TOk, TErr>>
+public abstract class ResultBase<TResult, TOk, TErr> : IEquatable<ResultBase<TResult, TOk, TErr>>
     where TResult : ResultBase<TResult, TOk, TErr>, IResultBase<TResult, TOk, TErr>
 {
     private protected readonly bool IsOk;
@@ -119,16 +119,6 @@ public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>, IEqua
         }
 
         return (TResult)this;
-    }
-
-    /// <summary>
-    /// Returns the <typeparamref name="TOk"/> value if result was ok or throws <see cref="ArgumentException"/>. This method should be avoided whenever possible in favour of <see cref="IsErr(out TErr?)"></see> or <see cref="IsErr(out TOk?, out TErr?)"></see>
-    /// </summary>
-    /// <returns>The <typeparamref name="TOk"/> value or throws</returns>
-    /// <exception cref="ArgumentException"></exception>
-    public TOk Unwrap()
-    {
-        return IsOk ? OkValue! : throw new ArgumentException("Result is in an error state");
     }
 
     /// <summary>
@@ -266,7 +256,7 @@ public abstract class ResultBase<TResult, TOk, TErr> : IResult<TOk, TErr>, IEqua
 /// </summary>
 /// <typeparam name="TResult">The type of the result</typeparam>
 /// <typeparam name="TErr">The type of the error</typeparam>
-public abstract class ResultBase<TResult, TErr> : IResult<TErr>, IEquatable<ResultBase<TResult, TErr>>
+public abstract class ResultBase<TResult, TErr> : IEquatable<ResultBase<TResult, TErr>>
     where TResult : ResultBase<TResult, TErr>, IResultBase<TResult, TErr>
 {
     private protected readonly bool IsOk;

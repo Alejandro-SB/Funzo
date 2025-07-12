@@ -155,8 +155,8 @@ public class ResultSerializatorTests
     }
 }
 
-[Result]
-public partial class CustomResult : IResult<int, string>;
+[Result<int, string>]
+public partial class CustomResult;
 
-[Result]
-public partial class CustomSimpleResult : IResult<string>;
+[Result<string>]
+public partial class CustomSimpleResult;

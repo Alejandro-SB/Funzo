@@ -30,8 +30,41 @@ public class UnionGeneratorTests
         Assert.True(u3.Is<DateTime>(out _));
         Assert.True(u4.Is<DateTimeOffset>(out _));
     }
+
+    [Fact]
+    public void Generates_Shared_Property()
+    {
+        CommonPropertyUnion u1 = new A("a");
+        CommonPropertyUnion u2 = new B("b");
+        CommonPropertyUnion u3 = new C("c");
+
+        Assert.Equal("a", u1.Text);
+        Assert.Equal("b", u2.Text);
+        Assert.Equal("c", u3.Text);
+    }
 }
 
 
-[Union]
-public partial class TestUnion : Union<string, int, DateTime, DateTimeOffset>;
+[Union<string, int, DateTime, DateTimeOffset>]
+public partial class TestUnion;
+
+[Union<A, B, C>]
+public partial class CommonPropertyUnion;
+
+public class A(string text)
+{
+    public string Text { get; set; } = text;
+    public int Number { get; set; }
+}
+
+public class B(string text)
+{
+    public string Text { get; set; } = text;
+    protected int Number { get; set; }
+}
+
+public class C(string text)
+{
+    public string Text { get; set; } = text;
+    public DateTime Date { get; set; }
+}
