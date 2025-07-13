@@ -9,7 +9,7 @@ internal class Result1AritySourceGenerator : ResultGenerator
     {
     }
 
-    internal override string ClassDefinition => $@"partial class {ClassName} : ResultBase<{ClassName},{ErrDisplayName}>, IResultBase <{ClassName},{ErrDisplayName}>";
+    internal override string ClassDefinition => $@"partial class {ClassName} : global::Funzo.ResultBase<{ClassName},{ErrDisplayName}>, global::Funzo.IResultBase <{ClassName},{ErrDisplayName}>";
 
     internal override string OkConstructor => @$"protected {ClassName}() : base() {{}}";
 
