@@ -26,7 +26,7 @@ internal class UnionSourceGenerator : SourceGeneratorBase
 
 namespace {classSymbol.ContainingNamespace.ToDisplayString()}
 {{
-    partial class {className} : Union{typeArguments.OpenGenericPart()}
+    partial class {className} : global::Funzo.Union{typeArguments.OpenGenericPart()}
     {{");
 
         foreach (var type in typeArguments)
