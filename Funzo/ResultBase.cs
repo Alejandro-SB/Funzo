@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Funzo;
 /// <summary>
@@ -41,6 +42,8 @@ public abstract class ResultBase<TResult, TOk, TErr> : IEquatable<ResultBase<TRe
     /// <param name="err">The function to execute if the operation failed</param>
     /// <returns>The result of the mapping function depending on the result</returns>
     public TOut Match<TOut>(Func<TOk, TOut> ok, Func<TErr, TOut> err) => IsOk ? ok(OkValue!) : err(ErrValue!);
+
+    public async AwaitableResult<TResult, TOk, TErr> OrReturn() => await new((TResult)this);
 
     /// <summary>
     /// Matches the result depending on the state

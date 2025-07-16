@@ -1,5 +1,6 @@
 ﻿using Funzo;
 using System;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -243,7 +244,7 @@ public class Result2ArityTests
         var result = Result<int, int>.Err(1);
         var mapped = result.MapErr(r => Result<int, string>.Err(r.ToString()));
 
-        var isErr = mapped.IsErr( out var err);
+        var isErr = mapped.IsErr(out var err);
 
         Assert.True(isErr);
         Assert.Equal("1", err);
@@ -278,4 +279,39 @@ public class Result2ArityTests
     private static void Pass<T>(T _) { }
     private static Action<T> Throw<T>(string message) => (_) => throw new Exception(message);
 
+#if NET6_0_OR_GREATER
+    [Fact]
+    public async Task TestAsync()
+    {
+        var s = await Do(1, 2);
+        Console.WriteLine("FIIRST");
+        var s2 = await Do(-1, 3);
+        Console.WriteLine("SECOND DO");
+    }
+
+    static AsyncResult Parse(int input)
+        => input > 0
+        ? AsyncResult.Ok(input)
+        : AsyncResult.Err("FAIL");
+
+    static AsyncResult Sum(int a, int b)
+        => a + b;
+
+    private static async Task<AsyncResult> Do(int a, int b)
+    {
+        Console.WriteLine("START");
+        var x = await Parse(a).OrReturn();
+        Console.WriteLine("PARSED 1");
+        var y = await Parse(b).OrReturn();
+        Console.WriteLine("Successfully parsed inputs");
+
+        return await Sum(x, y).OrReturn();
+    }
+#endif
 }
+
+#if NET6_0_OR_GREATER
+[Result<int, string>]
+[AsyncMethodBuilder(typeof(ResultAsyncMethodBuilder<,,>))]
+public partial class AsyncResult;
+#endif
