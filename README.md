@@ -320,7 +320,7 @@ or
 { "IsOk": false, "Err": *whatever* }
 ```
 
-`Union` serializes as a property, with the name of the property taking the value of the type used:
+`Union` serializes as an object with 2 properties: `tag` and `value`:
 ```chsarp
 [Union<int, string, DateTime>]
 public partial class MyUnion ;
@@ -331,7 +331,7 @@ public class MyClass
 }
 ```
 ```JSON
-{"Union":{"DateTime":"2025-07-12T13:34:57.6941483Z"}}
+{"Union":{"tag":"DateTime","value":"2025-07-12T13:34:57.6941483Z"}}
 ```
 
 ## Example
