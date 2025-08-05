@@ -12,34 +12,37 @@ public class UnionSerializatorTests
     {
         MyUnion stringUnion = "TEST";
         MyUnion intUnion = 33;
-        MyUnion dateUnion = DateTime.Parse("2025-02-11");
+        MyUnion dateUnion = new DateTime(2025, 2, 11, 0, 0, 0, DateTimeKind.Utc);
 
-        var converter = _unionConverterFactory.CreateConverter(typeof(MyUnion), JsonSerializerOptions.Default)!;
+        var converter = _unionConverterFactory.CreateConverter(typeof(MyUnion), JsonSerializerOptions.Web)!;
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(converter);
+        options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 
         var strSerialized = JsonSerializer.Serialize(stringUnion, options);
         var intSerialized = JsonSerializer.Serialize(intUnion, options);
         var dateSerialized = JsonSerializer.Serialize(dateUnion, options);
 
-        Console.WriteLine();
+        Assert.Equal(@"{""tag"":""String"",""value"":""TEST""}", strSerialized);
+        Assert.Equal(@"{""tag"":""Int32"",""value"":33}", intSerialized);
+        Assert.Equal(@"{""tag"":""DateTime"",""value"":""2025-02-11T00:00:00Z""}", dateSerialized);
     }
 
     [Fact]
     public void Deserializes_Union_Type()
     {
-        var strSerialized = @$"{{""String"":""TEST""}}";
-        var intSerialized = @$"{{""Int32"":33}}";
-        var dateSerialized = @$"{{""DateTime"":""2025-02-11T00:00:00Z""}}";
+        var intSerialized = @$"{{""value"":33,""tag"":""Int32""}}";
+        var strSerialized = @$"{{""tag"":""String"",""value"":""TEST""}}";
+        var dateSerialized = @$"{{""tag"":""DateTime"",""value"":""2025-02-11T00:00:00Z""}}";
 
         var converter = _unionConverterFactory.CreateConverter(typeof(MyUnion), JsonSerializerOptions.Default)!;
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(converter);
 
-        var str = JsonSerializer.Deserialize<MyUnion>(strSerialized, options)!;
         var intg = JsonSerializer.Deserialize<MyUnion>(intSerialized, options)!;
+        var str = JsonSerializer.Deserialize<MyUnion>(strSerialized, options)!;
         var date = JsonSerializer.Deserialize<MyUnion>(dateSerialized, options)!;
 
         var isString = str.Is<string>(out var s);
@@ -52,9 +55,9 @@ public class UnionSerializatorTests
 
         var isDate = date.Is<DateTime>(out var d);
         Assert.True(isDate);
-        Assert.Equal(new DateTime(2025, 2,11,0,0,0,DateTimeKind.Utc), d);
+        Assert.Equal(new DateTime(2025, 2, 11, 0, 0, 0, DateTimeKind.Utc), d);
     }
 }
 
 [Union<int, string, DateTime>]
-public partial class MyUnion ;
+public partial class MyUnion;

@@ -1,8 +1,6 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Funzo.Serialization;
 
@@ -45,6 +43,11 @@ public class UnionJsonConverter<TUnion> : JsonConverter<TUnion>
     /// <inheritdoc />
     public override TUnion? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+        if (typeToConvert.BaseType is not { } baseType)
+        {
+            throw new JsonException("Union should inherit from UnionBase");
+        }
+
         if (reader.TokenType is not JsonTokenType.StartObject)
         {
             throw new JsonException();
@@ -57,23 +60,29 @@ public class UnionJsonConverter<TUnion> : JsonConverter<TUnion>
             throw new JsonException();
         }
 
+        var taggedType = GetTaggedType(ref reader, baseType);
+
+        if (reader.TokenType is not JsonTokenType.PropertyName)
+        {
+            throw new JsonException();
+        }
+
         var propertyName = reader.GetString() ?? throw new JsonException();
 
-        if (typeToConvert.BaseType is not { } baseType)
+        if (!string.Equals(propertyName, nameof(UnionSerializedRepresentation.Value), StringComparison.OrdinalIgnoreCase))
         {
-            throw new JsonException();
+            throw new JsonException($"Unable to find the {nameof(UnionSerializedRepresentation.Value)} property inside the union");
         }
 
-        var types = baseType.GenericTypeArguments;
-        var propertyType = types.FirstOrDefault(t => string.Equals(t.Name, propertyName, options.PropertyNameCaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)) ?? throw new JsonException();
-
-        var value = JsonSerializer.Deserialize(ref reader, propertyType, options);
         reader.Read();
 
-        if (reader.TokenType is not JsonTokenType.EndObject)
+        var value = JsonSerializer.Deserialize(ref reader, taggedType, options);
+
+        // Completely consume the reader
+        do
         {
-            throw new JsonException();
-        }
+            reader.Read();
+        } while (reader.TokenType != JsonTokenType.EndObject);
 
         var unionInstance = (TUnion)Activator.CreateInstance(typeof(TUnion), [value])!;
 
@@ -84,11 +93,60 @@ public class UnionJsonConverter<TUnion> : JsonConverter<TUnion>
     public override void Write(Utf8JsonWriter writer, TUnion value, JsonSerializerOptions options)
     {
         var innerValue = value.GetValue();
-        var typeName = innerValue.GetType().Name;
 
-        writer.WriteStartObject();
-        writer.WritePropertyName(typeName);
-        JsonSerializer.Serialize(writer, innerValue, options);
-        writer.WriteEndObject();
+        var representation = new UnionSerializedRepresentation
+        {
+            Value = innerValue
+        };
+
+        JsonSerializer.Serialize(writer, representation, options);
+    }
+
+    /// <summary>
+    /// Checks for the tag property and reads its value, returning the matching type in the union
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <param name="baseType"></param>
+    /// <returns></returns>
+    /// <exception cref="JsonException"></exception>
+    private static Type GetTaggedType(ref Utf8JsonReader reader, Type baseType)
+    {
+        var propertyName = reader.GetString() ?? throw new JsonException();
+        string? typeName;
+
+        if (string.Equals(propertyName, nameof(UnionSerializedRepresentation.Tag), StringComparison.OrdinalIgnoreCase))
+        {
+            reader.Read();
+            typeName = reader.GetString();
+            reader.Read();
+        }
+        else
+        {
+            // Clone the reader to preserve current position, as we now want to read the value property
+            var clonedReader = reader;
+            // Skip union content
+            clonedReader.Read();
+            // Skip tag property
+            clonedReader.Read();
+            // Read tag property content
+            clonedReader.Read();
+
+            typeName = clonedReader.GetString();
+        }
+
+        if(typeName is null)
+        {
+            throw new JsonException("Unable to find the tag property in the union");
+        }
+
+        return GetTypeFromTag(baseType, typeName);
+    }
+
+    private static Type GetTypeFromTag(Type baseType, string typeName)
+    {
+        var types = baseType.GenericTypeArguments;
+        var unionType = types.FirstOrDefault(t => t.Name == typeName) ?? throw new JsonException();
+
+        return unionType;
     }
 }

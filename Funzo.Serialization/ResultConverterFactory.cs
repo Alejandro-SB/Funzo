@@ -76,8 +76,8 @@ public class ResultConverter<TResult, TOk, TErr> : JsonConverter<TResult>
         var deserializedValue = JsonSerializer.Deserialize<ResultRepresentation<TOk, TErr>>(ref reader, options) ?? throw new JsonException();
 
         return deserializedValue.IsOk
-            ? ProduceOk(deserializedValue.Ok!)
-            : ProduceErr(deserializedValue.Err!);
+            ? ResultConverter<TResult, TOk, TErr>.ProduceOk(deserializedValue.Ok!)
+            : ResultConverter<TResult, TOk, TErr>.ProduceErr(deserializedValue.Err!);
     }
 
     /// <inheritdoc />
@@ -94,7 +94,7 @@ public class ResultConverter<TResult, TOk, TErr> : JsonConverter<TResult>
         writer.WriteRawValue(content);
     }
 
-    private TResult ProduceErr(TErr err)
+    private static TResult ProduceErr(TErr err)
     {
 #if NET6_0_OR_GREATER
         return TResult.Err(err);
@@ -104,7 +104,7 @@ public class ResultConverter<TResult, TOk, TErr> : JsonConverter<TResult>
 #endif
     }
 
-    private TResult ProduceOk(TOk ok)
+    private static TResult ProduceOk(TOk ok)
     {
 #if NET6_0_OR_GREATER
         return TResult.Ok(ok);
@@ -134,8 +134,8 @@ public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
         var deserializedValue = JsonSerializer.Deserialize<ResultRepresentation<Unit, TErr>>(ref reader, options) ?? throw new JsonException();
 
         return deserializedValue.IsOk
-            ? ProduceOk()
-            : ProduceErr(deserializedValue.Err!);
+            ? ResultConverter<TResult, TErr>.ProduceOk()
+            : ResultConverter<TResult, TErr>.ProduceErr(deserializedValue.Err!);
     }
 
     /// <inheritdoc />
@@ -152,7 +152,7 @@ public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
         writer.WriteRawValue(content);
     }
 
-    private TResult ProduceErr(TErr err)
+    private static TResult ProduceErr(TErr err)
     {
 #if NET6_0_OR_GREATER
         return TResult.Err(err);
@@ -162,7 +162,7 @@ public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
 #endif
     }
 
-    private TResult ProduceOk()
+    private static TResult ProduceOk()
     {
 #if NET6_0_OR_GREATER
         return TResult.Ok();
