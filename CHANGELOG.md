@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 4.3.0
+- Completely removed `Unit` class
+
 ## 4.2.0
 - Removed unsafe code left
 

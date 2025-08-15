@@ -7,7 +7,7 @@ public class ResultGeneratorTests
     [Fact]
     public void Generates_Implicit_Conversors_And_Constructors()
     {
-        TestResult okImplicit = Unit.Default;
+        TestResult okImplicit = 0;
         TestResult errImplicit = "FAILURE";
 
         Assert.False(okImplicit.IsErr(out _));
@@ -17,7 +17,7 @@ public class ResultGeneratorTests
     [Fact]
     public void Generates_Ok_And_Err_Methods()
     {
-        var ok = TestResult.Ok(Unit.Default);
+        var ok = TestResult.Ok(0);
         var err = TestResult.Err("FAIL");
 
         Assert.False(ok.IsErr(out _));
@@ -64,7 +64,7 @@ public class ResultGeneratorTests
     }
 }
 
-[Result<Unit, string>]
+[Result<int, string>]
 public partial class TestResult;
 [Result<string>]
 public partial class TestUnitResult;

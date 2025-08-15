@@ -126,7 +126,6 @@ public class ResultSerializatorTests
         var customConverter = _resultConverterFactory.CreateConverter(typeof(CustomResult), JsonSerializerOptions.Default)!;
         var options = new JsonSerializerOptions();
         options.Converters.Add(simpleConverter);
-        options.Converters.Add(new UnitJsonConverter());
         options.Converters.Add(customConverter);
 
         var result = JsonSerializer.Deserialize<CustomSimpleResult>(text, options);

@@ -131,7 +131,7 @@ public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
             throw new JsonException();
         }
 
-        var deserializedValue = JsonSerializer.Deserialize<ResultRepresentation<Unit, TErr>>(ref reader, options) ?? throw new JsonException();
+        var deserializedValue = JsonSerializer.Deserialize<ResultRepresentation<string, TErr>>(ref reader, options) ?? throw new JsonException();
 
         return deserializedValue.IsOk
             ? ResultConverter<TResult, TErr>.ProduceOk()
@@ -145,7 +145,7 @@ public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
 
         object representation = isErr
             ? new ResultErrRepresentation<TErr>(err!)
-            : new ResultOkRepresentation<Unit>(default);
+            : new ResultOkRepresentation<string>(string.Empty);
 
         var content = JsonSerializer.Serialize(representation, options);
 

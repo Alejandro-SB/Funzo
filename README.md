@@ -14,7 +14,6 @@
   - [FluentResults](#fluentresults)
 - [Usage (recommended way)](#usage-recommended-way)
 - [Documentation](#documentation)
-  - [Unit](#unit)
   - [Option](#option)
   - [Result](#result)
   - [ResultBuilder](#resultbuilder)
@@ -33,8 +32,6 @@ Apart from the name, the `Maybe<T>` class was renamed to `Option<T>`. It is more
 ## Description
 
 _Funzo_ allows the developer to use some classes more commonly used in functional programming for error-proof programming and better type definition. It contains 4 classes:
-
-- The `Unit` class represents an empty class. Because functions always return something, `Unit` is the equivalent to `void`
 
 - The `Option<T>` class allows to create an item of type T that may have no value. This value cannot be accessed in an unsafe manner by design, making really easy to completely remove null references from your code and reducing the number of `NullReferenceException` exceptions thrown.
 
@@ -87,10 +84,6 @@ public partial class ItemCreatedResult;
 ```
 
 ## Documentation
-
-### Unit
-
-Unit is a helper type to represent the absence of a return value (think of it as void). Because in functional programming every function returns a value, it is added here for compatibility.
 
 ### Option
 
@@ -174,7 +167,7 @@ You can create an instance using the Ok/Err static methods:
 
 ```Csharp
 var okResult = Result<ProcessError>.Ok();
-var errorResult = Result<Unit, ProcessError>.Err(ProcessError.DatabaseConnection);
+var errorResult = Result<string, ProcessError>.Err(ProcessError.DatabaseConnection);
 ```
 
 You can map the ok value or err value using `Map` and `MapErr` methods:
@@ -214,14 +207,14 @@ Result<User, string> userCreationResult = await CreateUser(userPayload);
 
 if (userCreationResult.IsErr(out User user, out string error))
 {
-    return Result<Unit, UserCreationError>.Err(UserCreationError.CannotCreateUser);
+    return Result<int, UserCreationError>.Err(UserCreationError.CannotCreateUser);
 }
 
 var userRoleResult = await AssignRoles(user, Roles.Admin);
 
 if (userRoleResult.IsErr(out var roleError))
 {
-    return Result<Unit, UserCreationError>.Err(UserCreationError.CannotAssignRole);
+    return Result<int, UserCreationError>.Err(UserCreationError.CannotAssignRole);
 }
 
 emailService.NotifyUser(user.Email);
