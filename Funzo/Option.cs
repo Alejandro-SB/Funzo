@@ -18,10 +18,10 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     /// </summary>
     private readonly T? _value;
 
-    private Option(T value)
+    private Option(T? value)
     {
-        _value = value ?? throw new ArgumentNullException(nameof(value));
-        _hasValue = true;
+        _value = value;
+        _hasValue = value is { };
     }
 
     /// <summary>
@@ -117,7 +117,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     /// Converts between a value and a <see cref="Option{T}"/> instance
     /// </summary>
     /// <param name="value"></param>
-    public static implicit operator Option<T>(T value)
+    public static implicit operator Option<T>(T? value)
        => new(value);
 
     /// <summary>

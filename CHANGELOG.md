@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 4.2.0
+- Removed unsafe code left
+
+## 4.1.0
+- Added implicit conversions for predefined results
+
+## 4.0.0
+- Changed union serialization to expose a tag/value pair
+
+## 3.1.1
+- Fixed bug in source code generation
+
 ## 3.1.0
 - Now source generators don't need to inherit/implement interfaces. Using generic attributes types can be provided, avoiding innecesary clutter. This requires [C#11](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/reflection-and-attributes/generics-and-attributes)
 - Added Union serialization. It serializes to a property with the name of the property being the name of the type. Check README for some examples.

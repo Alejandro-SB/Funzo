@@ -5,20 +5,6 @@ namespace Funzo.Test;
 public class Result1ArityTests
 {
     [Fact]
-    public void Ok_Creates_A_Successful_Operation_Result()
-    {
-        var instance = Result<int>.Ok();
-        instance.EnsureOk("Should not fail");
-    }
-
-    [Fact]
-    public void Error_Creates_A_Failed_Operation_Result()
-    {
-        var instance = Result<int>.Err(7);
-        Assert.Throws<ArgumentException>(() => instance.EnsureOk("Should fail"));
-    }
-
-    [Fact]
     public void Match_When_Result_Is_Ok_Executes_Ok_Action()
     {
         var instance = Result<int>.Ok();
@@ -183,29 +169,6 @@ public class Result1ArityTests
         });
 
         Assert.NotNull(test);
-    }
-
-    [Fact]
-    public void AsOk_Returns_Option_With_Ok_Value()
-    {
-        var result = Result<string>.Ok();
-
-        var option = result.AsOk();
-        var isOk = option.IsSome(out _);
-
-        Assert.True(isOk);
-    }
-
-    [Fact]
-    public void AsOk_Returns_None_When_Err()
-    {
-        var result = Result<string>.Err("FAILURE");
-        var option = result.AsOk();
-
-        var isOk = option.IsSome(out var value);
-
-        Assert.Equal(Option<Unit>.None, value);
-        Assert.False(isOk);
     }
 
     [Fact]

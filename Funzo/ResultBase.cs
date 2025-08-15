@@ -309,24 +309,6 @@ public abstract class ResultBase<TResult, TErr> : IEquatable<ResultBase<TResult,
     }
 
     /// <summary>
-    /// Ensures that this instance is an Ok value. This method should be avoided whenever possible in favour of <see cref="IsErr(out TErr?)"></see>
-    /// </summary>
-    /// <exception cref="ArgumentException">Thrown if this instance is not in an Ok state</exception>
-    public void EnsureOk(string? errorMessage)
-    {
-        if (!IsOk)
-        {
-            throw new ArgumentException(errorMessage ?? "Result is not in OK state");
-        }
-    }
-
-    /// <summary>
-    /// Returns an <see cref="Option{T}"/> with a Some value if result is in an Ok state, None otherwise
-    /// </summary>
-    /// <returns>This result as an option</returns>
-    public Option<Unit> AsOk() => IsOk ? Option<Unit>.Some(Unit.Default) : Option<Unit>.None;
-
-    /// <summary>
     /// Returns a new <see cref="Result{T, TErr}"/> with a new return value for the Ok state
     /// </summary>
     /// <typeparam name="T">The new Ok value</typeparam>
