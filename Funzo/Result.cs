@@ -29,6 +29,17 @@ public sealed class Result<TOk, TErr> : ResultBase<Result<TOk, TErr>, TOk, TErr>
     /// <returns>An instance of <see cref="Result{TOk, TErr}"/> as a failed operation</returns>
     public static Result<TOk, TErr> Err(TErr err) => new(err);
 
+    /// <summary>
+    /// Converts <typeparamref name="TOk"/> into <see cref="Result{TOk, TErr}" /> implicitly
+    /// </summary>
+    /// <param name="ok">Value</param>
+    public static implicit operator Result<TOk, TErr>(TOk ok) => new(ok);
+    /// <summary>
+    /// Converts <typeparamref name="TErr"/> into <see cref="Result{TOk, TErr}" /> implicitly
+    /// </summary>
+    /// <param name="err">Value</param>
+    public static implicit operator Result<TOk, TErr>(TErr err) => new(err);
+
     /// <inheritdoc />
     public override bool Equals(object? obj)
     {
@@ -77,6 +88,12 @@ public sealed class Result<TErr> : ResultBase<Result<TErr>, TErr>, IResultBase<R
     /// <param name="err">The result of the failed operation</param>
     /// <returns>An instance of <see cref="Result{TErr}"/> as a failed operation</returns>
     public static Result<TErr> Err(TErr err) => new(err);
+
+    /// <summary>
+    /// Converts <typeparamref name="TErr"/> into <see cref="Result{TErr}" /> implicitly
+    /// </summary>
+    /// <param name="err">Value</param>
+    public static implicit operator Result<TErr>(TErr err) => new(err);
 
     /// <inheritdoc />
     public override bool Equals(object? obj)
