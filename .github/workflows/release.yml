@@ -5,7 +5,7 @@ on:
     types: [published]
 
 env:
-  VERSION: ${{ github.event.release.draft && format('{0}-beta', github.event.release.tag_name) || github.event.release.tag_name }}
+  VERSION: ${{ github.event.release.prerelease && format('{0}-beta', github.event.release.tag_name) || github.event.release.tag_name }}
 
 jobs:
   build:

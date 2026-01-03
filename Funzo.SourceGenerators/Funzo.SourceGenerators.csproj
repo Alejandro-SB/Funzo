@@ -17,6 +17,7 @@
 		<AssemblyVersion>$(AssemblyVersion)</AssemblyVersion>
 		<FileVersion>$(AssemblyVersion)</FileVersion>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<Version></Version>
 	</PropertyGroup>
 
