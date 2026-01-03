@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 
 namespace Funzo.SourceGenerators.Helpers;
+
 internal static class FunzoDiagnosticDescriptors
 {
     public static class Result
@@ -8,7 +9,7 @@ internal static class FunzoDiagnosticDescriptors
         public static DiagnosticDescriptor TopLevelError
             => new("FNZ0001",
                 "Class must be top level",
-                "Class '{0}' using ResultGenerator must be top level",
+                "Class '{0}' using ResultGenerator must be top level or inside a partial class",
                 "ResultGenerator",
                 DiagnosticSeverity.Error,
                 true);
@@ -33,7 +34,7 @@ internal static class FunzoDiagnosticDescriptors
         public static DiagnosticDescriptor TopLevelError
             => new("FNZ0004",
                 "Class must be top level",
-                "Class '{0}' using UnionGenerator must be top level",
+                "Class '{0}' using UnionGenerator must be top level or inside a partial class",
                 "UnionGenerator",
                 DiagnosticSeverity.Error,
                 true);

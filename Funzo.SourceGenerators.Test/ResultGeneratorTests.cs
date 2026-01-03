@@ -62,6 +62,14 @@ public class ResultGeneratorTests
 
         Assert.True(isOk);
     }
+
+    [Fact]
+    public void Generates_Nested_Results()
+    {
+        InnerClass.InnerResult result = "test";
+
+        Assert.True(result.IsErr(out _));
+    }
 }
 
 [Result<int, string>]
@@ -70,7 +78,7 @@ public partial class TestResult;
 public partial class TestUnitResult;
 
 [Union<int, string>]
-public partial class MyOk ;
+public partial class MyOk;
 
 [Result<MyOk, MyError>]
 public partial class TwoUnionResult;
@@ -83,3 +91,10 @@ public partial class ClonedOk;
 
 [Result<ClonedOk, ClonedErr>]
 public partial class CheapClone;
+
+
+public static partial class InnerClass
+{
+    [Result<int, string>]
+    public partial class InnerResult;
+}

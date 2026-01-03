@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Funzo.SourceGenerators.Test;
+
 public class UnionGeneratorTests
 {
     [Fact]
@@ -42,6 +43,14 @@ public class UnionGeneratorTests
         Assert.Equal("b", u2.Text);
         Assert.Equal("c", u3.Text);
     }
+
+    [Fact]
+    public void Generates_Inner_Union()
+    {
+        TestUnionInPartialClass.InnerUnion u = new TestUnionInPartialClass.A();
+
+        u.Switch(a => { }, b => throw new InvalidOperationException());
+    }
 }
 
 
@@ -67,4 +76,14 @@ public class C(string text)
 {
     public string Text { get; set; } = text;
     public DateTime Date { get; set; }
+}
+
+
+public static partial class TestUnionInPartialClass
+{
+    public record A;
+    public record B;
+
+    [Union<A, B>]
+    public partial class InnerUnion;
 }
