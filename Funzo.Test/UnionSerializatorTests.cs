@@ -14,7 +14,7 @@ public class UnionSerializatorTests
         MyUnion intUnion = 33;
         MyUnion dateUnion = new DateTime(2025, 2, 11, 0, 0, 0, DateTimeKind.Utc);
 
-        var converter = _unionConverterFactory.CreateConverter(typeof(MyUnion), JsonSerializerOptions.Web)!;
+        var converter = _unionConverterFactory.CreateConverter(typeof(MyUnion), new JsonSerializerOptions())!;
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(converter);
@@ -36,7 +36,7 @@ public class UnionSerializatorTests
         var strSerialized = @$"{{""tag"":""String"",""value"":""TEST""}}";
         var dateSerialized = @$"{{""tag"":""DateTime"",""value"":""2025-02-11T00:00:00Z""}}";
 
-        var converter = _unionConverterFactory.CreateConverter(typeof(MyUnion), JsonSerializerOptions.Default)!;
+        var converter = _unionConverterFactory.CreateConverter(typeof(MyUnion), new JsonSerializerOptions())!;
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(converter);

@@ -17,7 +17,7 @@ internal class UnionSourceGenerator : SourceGeneratorBase
         }
 
         var commonProperties = GetCommonProperties(symbolWithAttribute.TypeArguments);
-
+        
         var (classSymbol, _) = symbolWithAttribute;
         var className = $"{classSymbol.Name}";
         var typeArguments = symbolWithAttribute.TypeArguments;
@@ -26,7 +26,7 @@ internal class UnionSourceGenerator : SourceGeneratorBase
 
 namespace {classSymbol.ContainingNamespace.ToDisplayString()}
 {{
-    partial class {className} : global::Funzo.Union{typeArguments.OpenGenericPart()}
+    partial class {className} : global::Funzo.Union{typeArguments.OpenGenericPart()}, {string.Join(",",typeArguments.Select(a => $"global::Funzo.IUnion<{a.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>"))}
     {{");
 
         foreach (var type in typeArguments)
@@ -37,7 +37,17 @@ namespace {classSymbol.ContainingNamespace.ToDisplayString()}
 ");
         }
 
-        foreach(var prop in commonProperties)
+        // Implement static abstract member
+        foreach (var type in typeArguments)
+        {
+            var typeName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            source.Append($@"
+        public static TUnion From<TUnion>({typeName} _) where TUnion: class, IUnion<{typeName}> => (new {className}(_) as TUnion)!;
+            ");
+
+        }
+
+        foreach (var prop in commonProperties)
         {
             source.Append($@"
         public {prop.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} {prop.Name} => Match({string.Join(",", Enumerable.Range(0, typeArguments.Length).Select(_ => $"x => x.{prop.Name}"))});

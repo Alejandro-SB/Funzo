@@ -5,7 +5,7 @@ namespace Funzo;
 internal class ResultBuilder<TResult, TOk, TErr> : IResultBuilder<TResult, TOk, TErr>
     where TResult : IResultBase<TResult, TOk, TErr>
 {
-    private readonly Dictionary<Type, Func<object, TErr>> _maps = new();
+    private readonly Dictionary<Type, Func<object, TErr>> _maps = [];
     private Func<Exception, TErr>? _else;
 
     public ResultBuilder() { }
@@ -25,27 +25,17 @@ internal class ResultBuilder<TResult, TOk, TErr> : IResultBuilder<TResult, TOk, 
     }
 
     public TResult Try(Func<TResult> action) 
-        => BuilderHelpers.Try(action, _maps, _else, Producer);
+        => BuilderHelpers.Try(action, _maps, _else, TResult.Err);
 
     public async Task<TResult> TryAsync(Func<Task<TResult>> action) 
-        => await BuilderHelpers.TryAsync(action, _maps, _else, Producer);
-
-    private TResult Producer(TErr err)
-    {
-#if NET6_0_OR_GREATER
-            return TResult.Err(err);
-#else
-        var staticErr = typeof(TResult).GetMethod("Err", BindingFlags.Static | BindingFlags.Public);
-        return (TResult)staticErr.Invoke(null, new object[] { err! });
-#endif
-    }
+        => await BuilderHelpers.TryAsync(action, _maps, _else, TResult.Err);
 }
 
 
 internal class ResultBuilder<TResult, TErr> : IResultBuilder<TResult, TErr>
     where TResult : IResultBase<TResult, TErr>
 {
-    private readonly Dictionary<Type, Func<object, TErr>> _maps = new();
+    private readonly Dictionary<Type, Func<object, TErr>> _maps = [];
     private Func<Exception, TErr>? _else;
 
     public ResultBuilder() { }
@@ -65,20 +55,10 @@ internal class ResultBuilder<TResult, TErr> : IResultBuilder<TResult, TErr>
     }
 
     public TResult Try(Func<TResult> action) 
-        => BuilderHelpers.Try(action, _maps, _else, Producer);
+        => BuilderHelpers.Try(action, _maps, _else, TResult.Err);
 
     public async Task<TResult> TryAsync(Func<Task<TResult>> action) 
-        => await BuilderHelpers.TryAsync(action, _maps, _else, Producer);
-
-    private TResult Producer(TErr err)
-    {
-#if NET6_0_OR_GREATER
-            return TResult.Err(err);
-#else
-        var staticErr = typeof(TResult).GetMethod("Err", BindingFlags.Static | BindingFlags.Public);
-        return (TResult)staticErr.Invoke(null, new object[] { err! });
-#endif
-    }
+        => await BuilderHelpers.TryAsync(action, _maps, _else, TResult.Err);
 }
 
 internal class BuilderHelpers

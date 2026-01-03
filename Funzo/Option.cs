@@ -114,6 +114,15 @@ public readonly struct Option<T> : IEquatable<Option<T>>
     }
 
     /// <summary>
+    /// Converts this option instance into a <see cref="Result{TOk, TErr}"/>, being Ok if this instance contains a value, or <paramref name="err"/> if it doesn't
+    /// </summary>
+    /// <typeparam name="TErr"></typeparam>
+    /// <param name="err"></param>
+    /// <returns></returns>
+    public Result<T, TErr> ToResult<TErr>(TErr err)
+        => _hasValue ? _value! : err;
+
+    /// <summary>
     /// Converts between a value and a <see cref="Option{T}"/> instance
     /// </summary>
     /// <param name="value"></param>
@@ -190,7 +199,7 @@ public static class Option
     /// <typeparam name="T">The type of the value</typeparam>
     /// <param name="value">The value that will be used to create the instance</param>
     /// <returns>The <see cref="Option{T}"/> instance</returns>
-    public static Option<T> FromValue<T>(T? value)
+    public static Option<T> From<T>(T? value)
         where T : class
         => value is null ? Option<T>.None : Option<T>.Some(value);
 
@@ -200,7 +209,7 @@ public static class Option
     /// <typeparam name="T">The type of the value</typeparam>
     /// <param name="value">The value that will be used to create the instance</param>
     /// <returns>The <see cref="Option{T}"/> instance</returns>
-    public static Option<T> FromValue<T>(T? value)
+    public static Option<T> From<T>(T? value)
         where T : struct
         => value is { } v ? Option<T>.Some(v) : Option<T>.None;
 
@@ -247,4 +256,12 @@ public static class Option
     /// <returns>A new task wrapping the operation</returns>
     public static Task<T> ValueOr<T>(this Task<Option<T>> task, T value)
         => task.Then(t => t.ValueOr(value));
+
+    /// <summary>
+    /// Returns the value of this instance if exists or the default value
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="task"></param>
+    /// <returns>The value of this instance or default if none</returns>
+    public static Task<T?> ValueOrDefault<T>(this Task<Option<T>> task) => task.Then(t => t.ValueOrDefault());
 }

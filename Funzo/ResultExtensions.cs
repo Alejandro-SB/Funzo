@@ -12,10 +12,7 @@ public static class ResultExtensions
     /// <typeparam name="TErr"></typeparam>
     /// <param name="task">The task to extract the result from</param>
     /// <returns>A task wrapping the result</returns>
-    public static Task<Option<TOk>> AsOk<TOk, TErr>(this Task<Result<TOk, TErr>> task)
-    {
-        return task.Then(t => t.AsOk());
-    }
+    public static Task<Option<TOk>> ToOption<TOk, TErr>(this Task<Result<TOk, TErr>> task) => task.Then(t => t.ToOption());
 
     /// <summary>
     /// Applies a predicate to the result of a task
@@ -27,11 +24,9 @@ public static class ResultExtensions
     /// <param name="fail">The action to execute if the result fails</param>
     /// <returns>A wrapper around the original task</returns>
     public static Task Match<TOk, TErr>(this Task<Result<TOk, TErr>> task, Action<TOk> ok, Action<TErr> fail)
-    {
-        return task.Then(t =>
-        {
-            t.Match(ok, fail);
-            return Task.CompletedTask;
-        });
-    }
+        => task.Then(t =>
+            {
+                t.Match(ok, fail);
+                return Task.CompletedTask;
+            });
 }

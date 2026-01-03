@@ -21,12 +21,11 @@ namespace Funzo.SourceGenerators
                 .CreateSyntaxProvider(IsSyntaxTargetForGeneration, GetSemanticTargetForGeneration(FunzoAttributeSources.UnionAttributeFullNames))
                 .Where(static m => m is not null)
                 .Collect()!;
-
+            
             context.RegisterSourceOutput(unionClasses, (spc, symbols) => Execute(spc, symbols, new UnionSourceGenerator()));
 
             static bool IsSyntaxTargetForGeneration(SyntaxNode node, CancellationToken _)
-                => node is ClassDeclarationSyntax classDeclarationSyntax
-                       && classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword);
+                => node is ClassDeclarationSyntax classDeclarationSyntax;
 
             static Func<GeneratorSyntaxContext, CancellationToken, SymbolWithAttribute?> GetSemanticTargetForGeneration(string[] attributeNames)
                 => (context, cancellationToken) =>

@@ -122,18 +122,6 @@ public abstract class ResultBase<TResult, TOk, TErr> : IEquatable<ResultBase<TRe
     }
 
     /// <summary>
-    /// Returns <see langword="true" /> and assigns <paramref name="err"/> when <see cref="Result{TOk, TErr}"/> is an Error, <see langword="false"/> otherwise.
-    /// </summary>
-    /// <param name="err">The error contained in this instance, or <see langword="default"/> if no value present</param>
-    /// <returns><see langword="true" /> when a value exists, <see langword="false" /> otherwise</returns>
-    public bool IsErr([NotNullWhen(true)] out TErr? err)
-    {
-        err = ErrValue;
-
-        return !IsOk;
-    }
-
-    /// <summary>
     /// Returns <see langword="true" /> and assigns <paramref name="err"/> when <see cref="Result{TOk, TErr}"/> is an Error, <see langword="false"/> and assigns <paramref name="ok"/> otherwise.
     /// </summary>
     /// <param name="ok">The ok parameter contained in this instance, or <see langword="default"/> if no value present</param>
@@ -151,7 +139,7 @@ public abstract class ResultBase<TResult, TOk, TErr> : IEquatable<ResultBase<TRe
     /// Converts the result into a <see cref="Option{TOk}"/>
     /// </summary>
     /// <returns><see cref="Option.Some{TOk}(TOk)" /> if the result is successful, <see cref="Option{TOk}.None"/> otherwise</returns>
-    public Option<TOk> AsOk() => IsOk ? Option.Some(OkValue!) : Option<TOk>.None;
+    public Option<TOk> ToOption() => IsOk ? Option.Some(OkValue!) : Option<TOk>.None;
 
     /// <summary>
     /// Returns a new <see cref="Result{T, TErr}"/> with the value corresponding to <typeparamref name="TOk"/> transformed
@@ -224,24 +212,19 @@ public abstract class ResultBase<TResult, TOk, TErr> : IEquatable<ResultBase<TRe
     public static IResultBuilder<TResult, TOk, TErr> For() => new ResultBuilder<TResult, TOk, TErr>();
 
     /// <inheritdoc />
-    public bool Equals(ResultBase<TResult, TOk, TErr>? other)
-    {
-        return other is not null
-            && other.IsOk == IsOk
-            && (
-                (other.IsOk && other.OkValue!.Equals(OkValue!))
-                || (!other.IsOk && other.ErrValue!.Equals(ErrValue!))
-            );
-    }
+    public bool Equals(ResultBase<TResult, TOk, TErr>? other) 
+        => other is not null
+        && other.IsOk == IsOk
+        && (
+            (other.IsOk && other.OkValue!.Equals(OkValue!))
+            || (!other.IsOk && other.ErrValue!.Equals(ErrValue!))
+        );
 
     /// <inheritdoc />
     public override int GetHashCode() => IsOk ? 0 : ErrValue!.GetHashCode();
 
     /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        return obj is ResultBase<TResult, TOk, TErr> result && result.Equals(this);
-    }
+    public override bool Equals(object? obj) => obj is ResultBase<TResult, TOk, TErr> result && result.Equals(this);
 
     /// <inheritdoc />
     public static bool operator ==(ResultBase<TResult, TOk, TErr> lhs, ResultBase<TResult, TOk, TErr> rhs)
@@ -461,11 +444,9 @@ public abstract class ResultBase<TResult, TErr> : IEquatable<ResultBase<TResult,
                 || other.ErrValue!.Equals(ErrValue!)
             );
     }
+
     /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        return obj is ResultBase<TResult, TErr> result && result.Equals(this);
-    }
+    public override bool Equals(object? obj) => obj is ResultBase<TResult, TErr> result && result.Equals(this);
 
     /// <inheritdoc />
     public override int GetHashCode() => IsOk ? 0 : ErrValue!.GetHashCode();

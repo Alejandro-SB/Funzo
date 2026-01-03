@@ -94,25 +94,8 @@ public class ResultConverter<TResult, TOk, TErr> : JsonConverter<TResult>
         writer.WriteRawValue(content);
     }
 
-    private static TResult ProduceErr(TErr err)
-    {
-#if NET6_0_OR_GREATER
-        return TResult.Err(err);
-#else
-        var staticErr = typeof(TResult).GetMethod("Err", BindingFlags.Static | BindingFlags.Public);
-        return (TResult)staticErr.Invoke(null, [err!]);
-#endif
-    }
-
-    private static TResult ProduceOk(TOk ok)
-    {
-#if NET6_0_OR_GREATER
-        return TResult.Ok(ok);
-#else
-        var staticOk = typeof(TResult).GetMethod("Ok", BindingFlags.Static | BindingFlags.Public);
-        return (TResult)staticOk.Invoke(null, [ok!]);
-#endif
-    }
+    private static TResult ProduceErr(TErr err) => TResult.Err(err);
+    private static TResult ProduceOk(TOk ok) => TResult.Ok(ok);
 }
 
 /// <summary>
@@ -152,23 +135,7 @@ public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
         writer.WriteRawValue(content);
     }
 
-    private static TResult ProduceErr(TErr err)
-    {
-#if NET6_0_OR_GREATER
-        return TResult.Err(err);
-#else
-        var staticErr = typeof(TResult).GetMethod("Err", BindingFlags.Static | BindingFlags.Public);
-        return (TResult)staticErr.Invoke(null, [err!]);
-#endif
-    }
+    private static TResult ProduceErr(TErr err) => TResult.Err(err);
 
-    private static TResult ProduceOk()
-    {
-#if NET6_0_OR_GREATER
-        return TResult.Ok();
-#else
-        var staticOk = typeof(TResult).GetMethod("Ok", BindingFlags.Static | BindingFlags.Public);
-        return (TResult)staticOk.Invoke(null, []);
-#endif
-    }
+    private static TResult ProduceOk() => TResult.Ok();
 }

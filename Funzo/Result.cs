@@ -41,27 +41,19 @@ public sealed class Result<TOk, TErr> : ResultBase<Result<TOk, TErr>, TOk, TErr>
     public static implicit operator Result<TOk, TErr>(TErr err) => new(err);
 
     /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        return obj is Result<TOk, TErr> result && result.Equals(this);
-    }
+    public override bool Equals(object? obj) => obj is Result<TOk, TErr> result && result.Equals(this);
 
     /// <inheritdoc />
-    public bool Equals(Result<TOk, TErr>? other)
-    {
-        return other is not null
-            && other.IsOk == IsOk
-            && (
-                IsOk && OkValue!.Equals(other.OkValue)
-                || !IsOk && ErrValue!.Equals(other.ErrValue)
-                );
-    }
+    public bool Equals(Result<TOk, TErr>? other) 
+        => other is not null
+        && other.IsOk == IsOk
+        && (
+            IsOk && OkValue!.Equals(other.OkValue)
+            || !IsOk && ErrValue!.Equals(other.ErrValue)
+            );
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        return IsOk ? OkValue!.GetHashCode() : ErrValue!.GetHashCode();
-    }
+    public override int GetHashCode() => IsOk ? OkValue!.GetHashCode() : ErrValue!.GetHashCode();
 }
 
 /// <inheritdoc />
@@ -96,24 +88,16 @@ public sealed class Result<TErr> : ResultBase<Result<TErr>, TErr>, IResultBase<R
     public static implicit operator Result<TErr>(TErr err) => new(err);
 
     /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        return obj is Result<TErr> result && result.Equals(this);
-    }
+    public override bool Equals(object? obj) => obj is Result<TErr> result && result.Equals(this);
 
     /// <inheritdoc />
-    public bool Equals(Result<TErr>? other)
-    {
-        return other is not null
-            && other.IsOk == IsOk
-            && (
-                IsOk || ErrValue!.Equals(other.ErrValue)
-                );
-    }
+    public bool Equals(Result<TErr>? other) 
+        => other is not null
+        && other.IsOk == IsOk
+        && (
+            IsOk || ErrValue!.Equals(other.ErrValue)
+            );
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        return IsOk ? 0 : ErrValue!.GetHashCode();
-    }
+    public override int GetHashCode() => IsOk ? 0 : ErrValue!.GetHashCode();
 }

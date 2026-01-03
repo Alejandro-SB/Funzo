@@ -129,7 +129,7 @@ public class OptionTests
     [InlineData(0)]
     public void FromValue_Creates_A_Option_Instance_For_Structs_Depending_On_Value_Supplied(int? value)
     {
-        var instance = Option.FromValue(value);
+        var instance = Option.From(value);
         var expected = value is { } v
             ? Option.Some(v)
             : Option<int>.None;
@@ -143,7 +143,7 @@ public class OptionTests
     [InlineData("HMMM")]
     public void FromValue_Creates_A_Option_Instance_For_Classes_Depending_On_Value_Supplied(string? value)
     {
-        var instance = Option.FromValue(value);
+        var instance = Option.From(value);
         var expected = value is not null
             ? Option.Some(value)
             : Option<string>.None;

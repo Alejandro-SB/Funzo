@@ -12,7 +12,7 @@ public class ResultSerializatorTests
     {
         var num = 4;
         var result = Result<int, string>.Ok(num);
-        var converter = _resultConverterFactory.CreateConverter(result.GetType(), JsonSerializerOptions.Default)!;
+        var converter = _resultConverterFactory.CreateConverter(result.GetType(), new JsonSerializerOptions())!;
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(converter);
@@ -28,7 +28,7 @@ public class ResultSerializatorTests
     {
         var text = "ERROR";
         var result = Result<int, string>.Err(text);
-        var converter = _resultConverterFactory.CreateConverter(result.GetType(), JsonSerializerOptions.Default)!;
+        var converter = _resultConverterFactory.CreateConverter(result.GetType(), new JsonSerializerOptions())!;
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(converter);
@@ -43,7 +43,7 @@ public class ResultSerializatorTests
     public void Result_Serializer_Deserializes_Err_Result()
     {
         var text = "ERROR";
-        var converter = _resultConverterFactory.CreateConverter(typeof(Result<int, string>), JsonSerializerOptions.Default)!;
+        var converter = _resultConverterFactory.CreateConverter(typeof(Result<int, string>), new JsonSerializerOptions())!;
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(converter);
@@ -63,7 +63,7 @@ public class ResultSerializatorTests
     {
         var number = 73;
         var text = $@"{{""IsOk"":true,""Ok"":{number}}}";
-        var converter = _resultConverterFactory.CreateConverter(typeof(Result<int, string>), JsonSerializerOptions.Default)!;
+        var converter = _resultConverterFactory.CreateConverter(typeof(Result<int, string>), new JsonSerializerOptions())!;
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(converter);
@@ -82,7 +82,7 @@ public class ResultSerializatorTests
     {
         var text = @$"{{""IsOk"":true,""Ok"":1}}";
 
-        var converter = _resultConverterFactory.CreateConverter(typeof(CustomResult), JsonSerializerOptions.Default)!;
+        var converter = _resultConverterFactory.CreateConverter(typeof(CustomResult), new JsonSerializerOptions())!;
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(converter);
@@ -102,7 +102,7 @@ public class ResultSerializatorTests
     {
         var text = @$"{{""IsOk"":false,""Err"":""error""}}";
 
-        var converter = _resultConverterFactory.CreateConverter(typeof(CustomSimpleResult), JsonSerializerOptions.Default)!;
+        var converter = _resultConverterFactory.CreateConverter(typeof(CustomSimpleResult), new JsonSerializerOptions())!;
 
         var options = new JsonSerializerOptions();
         options.Converters.Add(converter);
@@ -122,8 +122,8 @@ public class ResultSerializatorTests
     {
         var text = @$"{{""IsOk"":true,""Ok"":""""}}";
 
-        var simpleConverter = _resultConverterFactory.CreateConverter(typeof(CustomSimpleResult), JsonSerializerOptions.Default)!;
-        var customConverter = _resultConverterFactory.CreateConverter(typeof(CustomResult), JsonSerializerOptions.Default)!;
+        var simpleConverter = _resultConverterFactory.CreateConverter(typeof(CustomSimpleResult), new JsonSerializerOptions())!;
+        var customConverter = _resultConverterFactory.CreateConverter(typeof(CustomResult), new JsonSerializerOptions())!;
         var options = new JsonSerializerOptions();
         options.Converters.Add(simpleConverter);
         options.Converters.Add(customConverter);

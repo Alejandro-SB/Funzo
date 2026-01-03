@@ -25,7 +25,7 @@ public class OptionSerializatorTests
         var option = Option.Some(text);
 
 
-        var converter = _optionConverterFactory.CreateConverter(option.GetType(), JsonSerializerOptions.Default)!;
+        var converter = _optionConverterFactory.CreateConverter(option.GetType(), new JsonSerializerOptions())!;
 
         var serializerOptions = new JsonSerializerOptions();
         serializerOptions.Converters.Add(converter);
@@ -41,7 +41,7 @@ public class OptionSerializatorTests
         var expected = @$"{{""HasValue"":false}}";
         var option = Option<string>.None;
 
-        var converter = _optionConverterFactory.CreateConverter(option.GetType(), JsonSerializerOptions.Default)!;
+        var converter = _optionConverterFactory.CreateConverter(option.GetType(), new JsonSerializerOptions())!;
 
         var serializerOptions = new JsonSerializerOptions();
         serializerOptions.Converters.Add(converter);
@@ -68,7 +68,7 @@ public class OptionSerializatorTests
             Date = date
         });
 
-        var converter = _optionConverterFactory.CreateConverter(option.GetType(), JsonSerializerOptions.Default)!;
+        var converter = _optionConverterFactory.CreateConverter(option.GetType(), new JsonSerializerOptions())!;
 
         var serializerOptions = new JsonSerializerOptions();
         serializerOptions.Converters.Add(converter);
@@ -88,7 +88,7 @@ public class OptionSerializatorTests
 
         var serializedValue = $@"{{""HasValue"":true,""Value"":{{""Number"":{number},""Text"":""{text}"",""Date"":""{dateSerialized}""}}}}";
 
-        var converter = _optionConverterFactory.CreateConverter(typeof(Option<ComplexClass>), JsonSerializerOptions.Default)!;
+        var converter = _optionConverterFactory.CreateConverter(typeof(Option<ComplexClass>), new JsonSerializerOptions())!;
 
         var serializerOptions = new JsonSerializerOptions();
         serializerOptions.Converters.Add(converter);
@@ -112,7 +112,7 @@ public class OptionSerializatorTests
     {
         var text = @$"{{""HasValue"":false}}";
 
-        var converter = _optionConverterFactory.CreateConverter(typeof(Option<ComplexClass>), JsonSerializerOptions.Default)!;
+        var converter = _optionConverterFactory.CreateConverter(typeof(Option<ComplexClass>), new JsonSerializerOptions())!;
 
         var serializerOptions = new JsonSerializerOptions();
         serializerOptions.Converters.Add(converter);

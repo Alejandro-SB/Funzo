@@ -42,14 +42,39 @@ public class UnionGeneratorTests
         Assert.Equal("b", u2.Text);
         Assert.Equal("c", u3.Text);
     }
-}
 
+    [Fact]
+    public void Returns_Generic_Item_By_Interface()
+    {
+        var testString = "TEST";
+        var first = GetUnion<TestUnion>(testString);
+        var second = GetUnion<AnotherTestUnion>(testString);
+
+        Assert.True(first.Is<string>(out var firstValue));
+        Assert.True(second.Is<string>(out var secondValue));
+
+        Assert.Equal(testString, firstValue);
+        Assert.Equal(testString, secondValue);
+    }
+
+    private TOut GetUnion<TOut>(string value)
+        where TOut: class, IUnion<string>
+    {
+        return TOut.From<TOut>(value);
+    }
+}
 
 [Union<string, int, DateTime, DateTimeOffset>]
 public partial class TestUnion;
 
+[Union<string, short>]
+public partial class AnotherTestUnion;
+
 [Union<A, B, C>]
 public partial class CommonPropertyUnion;
+
+[Union<B, A>]
+public partial record RecordUnion;
 
 public class A(string text)
 {

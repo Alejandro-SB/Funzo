@@ -10,8 +10,8 @@ public class ResultGeneratorTests
         TestResult okImplicit = 0;
         TestResult errImplicit = "FAILURE";
 
-        Assert.False(okImplicit.IsErr(out _));
-        Assert.True(errImplicit.IsErr(out _));
+        Assert.False(okImplicit.IsErr(out _, out _));
+        Assert.True(errImplicit.IsErr(out _, out _));
     }
 
     [Fact]
@@ -20,8 +20,8 @@ public class ResultGeneratorTests
         var ok = TestResult.Ok(0);
         var err = TestResult.Err("FAIL");
 
-        Assert.False(ok.IsErr(out _));
-        Assert.True(err.IsErr(out _));
+        Assert.False(ok.IsErr(out _, out _));
+        Assert.True(err.IsErr(out _, out _));
     }
 
     [Fact]
@@ -50,11 +50,11 @@ public class ResultGeneratorTests
 
         var err = process(1);
 
-        var isErr = err.IsErr(out var e);
+        var isErr = err.IsErr(out _, out var e);
 
         Assert.True(isErr);
 
-        e!.Switch(a => { }, b => throw new Exception("Should not reach"), c => throw new Exception("Should not reach"));
+        e!.Switch(_ => { }, b => throw new Exception("Should not reach"), c => throw new Exception("Should not reach"));
 
         var ok = process(4);
 
@@ -70,7 +70,7 @@ public partial class TestResult;
 public partial class TestUnitResult;
 
 [Union<int, string>]
-public partial class MyOk ;
+public partial class MyOk;
 
 [Result<MyOk, MyError>]
 public partial class TwoUnionResult;

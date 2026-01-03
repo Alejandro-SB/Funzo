@@ -1,9 +1,8 @@
-﻿using Funzo;
-using System;
-using System.Text.Json;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace Funzo.Test;
+
 public class Result2ArityTests
 {
     [Fact]
@@ -76,7 +75,7 @@ public class Result2ArityTests
         var expectedText = "ERROR";
         var result = Result<string, string>.Err(expectedText);
 
-        Assert.True(result.IsErr(out var errorText));
+        Assert.True(result.IsErr(out _, out var errorText));
 
         Assert.Equal(expectedText, errorText);
     }
@@ -206,7 +205,7 @@ public class Result2ArityTests
         var expected = 3;
         var result = Result<int, string>.Ok(expected);
 
-        var option = result.AsOk();
+        var option = result.ToOption();
         var isOk = option.IsSome(out var value);
 
         Assert.True(isOk);
@@ -217,7 +216,7 @@ public class Result2ArityTests
     public void AsOk_Returns_None_When_Err()
     {
         var result = Result<string, string>.Err("FAILURE");
-        var option = result.AsOk();
+        var option = result.ToOption();
 
         var isOk = option.IsSome(out var value);
 
@@ -243,7 +242,7 @@ public class Result2ArityTests
         var result = Result<int, int>.Err(1);
         var mapped = result.MapErr(r => Result<int, string>.Err(r.ToString()));
 
-        var isErr = mapped.IsErr( out var err);
+        var isErr = mapped.IsErr(out _, out var err);
 
         Assert.True(isErr);
         Assert.Equal("1", err);
