@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 5.0.1
+- Removed compatibility with older versions of .NET for easier development
+- Allow definition of source generated results and unions inside partial classes for better code grouping
+
 ## 4.3.0
 - Completely removed `Unit` class
 
