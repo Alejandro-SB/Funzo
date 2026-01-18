@@ -1,4 +1,4 @@
-﻿using Funzo.SourceGenerators.Generators.Unions;
+﻿using Funzo.SourceGenerators.Generators;
 using Funzo.SourceGenerators.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -11,24 +11,24 @@ using System.Threading;
 namespace Funzo.SourceGenerators
 {
     [Generator]
-    public class FunzoGenerators : IIncrementalGenerator
+    public class ResultSourceGenerator : IIncrementalGenerator
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            context.RegisterPostInitializationOutput(ctx => ctx.AddSource($"{FunzoAttributeSources.UnionAttributeName}.g.cs", FunzoAttributeSources.UnionAttributeContent));
+            context.RegisterPostInitializationOutput(ctx => ctx.AddSource($"{FunzoAttributeSources.ResultAttributeName}.g.cs", FunzoAttributeSources.ResultAttributeContent));
 
-            IncrementalValueProvider<ImmutableArray<SymbolWithAttribute>> unionClasses = context.SyntaxProvider
-                .CreateSyntaxProvider(IsSyntaxTargetForGeneration, GetSemanticTargetForGeneration(FunzoAttributeSources.UnionAttributeFullNames))
+            IncrementalValueProvider<ImmutableArray<MarkedType>> resultClasses = context.SyntaxProvider
+                .CreateSyntaxProvider(IsSyntaxTargetForGeneration, GetSemanticTargetForGeneration(FunzoAttributeSources.ResultAttributeFullNames))
                 .Where(static m => m is not null)
                 .Collect()!;
 
-            context.RegisterSourceOutput(unionClasses, (spc, symbols) => Execute(spc, symbols, new UnionSourceGenerator()));
+            context.RegisterSourceOutput(resultClasses, (spc, symbols) => Execute(spc, symbols, new Generators.ResultSourceGenerator()));
 
             static bool IsSyntaxTargetForGeneration(SyntaxNode node, CancellationToken _)
                 => node is ClassDeclarationSyntax classDeclarationSyntax
                        && classDeclarationSyntax.Modifiers.Any(SyntaxKind.PartialKeyword);
 
-            static Func<GeneratorSyntaxContext, CancellationToken, SymbolWithAttribute?> GetSemanticTargetForGeneration(string[] attributeNames)
+            static Func<GeneratorSyntaxContext, CancellationToken, MarkedType?> GetSemanticTargetForGeneration(string[] attributeNames)
                 => (context, cancellationToken) =>
                 {
                     var node = context.Node;
@@ -46,18 +46,20 @@ namespace Funzo.SourceGenerators
                 };
         }
 
-        private static void Execute(SourceProductionContext context, ImmutableArray<SymbolWithAttribute> symbols, SourceGeneratorBase sourceGenerator)
+        private static void Execute(SourceProductionContext context, ImmutableArray<MarkedType> markedTypes, GeneratorBase sourceGenerator)
         {
-            foreach (var symbol in symbols)
+            foreach (var type in markedTypes)
             {
-                var source = sourceGenerator.GetSource(context, symbol);
+                var source = sourceGenerator.GetSource(context, type);
 
                 if (source is null)
                 {
                     continue;
                 }
 
-                context.AddSource($"{symbol.Symbol!.ContainingNamespace}_{symbol.Symbol.Name}.g.cs", source);
+                var containingNamespace = type.Symbol.ContainingNamespace + string.Join("_", type.ContainerClasses);
+
+                context.AddSource($"{containingNamespace}_{type.Symbol.Name}.g.cs", source);
             }
         }
     }

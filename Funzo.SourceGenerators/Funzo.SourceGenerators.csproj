@@ -6,7 +6,6 @@
 		<Title>Funzo.Generators</Title>
 		<Description>Source generators for result and union types</Description>
 		<PackageTags>functional programming;option types;monad;union types;discriminated unions;result</PackageTags>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<LangVersion>preview</LangVersion>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
