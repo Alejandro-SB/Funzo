@@ -5,13 +5,14 @@ using System.Collections.Immutable;
 using System.Text;
 
 namespace Funzo.SourceGenerators.Generators.Results;
+
 internal abstract class ResultGenerator
 {
-    private readonly SymbolWithAttribute _symbolWithAttribute;
+    private readonly MarkedType _symbolWithAttribute;
     protected INamedTypeSymbol ClassSymbol => _symbolWithAttribute.Symbol;
-    protected ImmutableArray<ITypeSymbol> TypeArguments => _symbolWithAttribute.AttributeData.AttributeClass!.TypeArguments;
+    protected ImmutableArray<ITypeSymbol> TypeArguments => _symbolWithAttribute.AttributeTypeArguments;
 
-    protected ResultGenerator(SymbolWithAttribute symbolWithAttribute)
+    protected ResultGenerator(MarkedType symbolWithAttribute)
     {
         _symbolWithAttribute = symbolWithAttribute;
     }

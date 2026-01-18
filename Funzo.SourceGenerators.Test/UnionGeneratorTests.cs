@@ -47,7 +47,7 @@ public class UnionGeneratorTests
     [Fact]
     public void Generates_Inner_Union()
     {
-        TestUnionInPartialClass.InnerUnion u = new TestUnionInPartialClass.A();
+        TestUnionInPartialClass.InnerClass.InnerUnion u = new TestUnionInPartialClass.A();
 
         u.Switch(a => { }, b => throw new InvalidOperationException());
     }
@@ -84,6 +84,9 @@ public static partial class TestUnionInPartialClass
     public record A;
     public record B;
 
-    [Union<A, B>]
-    public partial class InnerUnion;
+    public partial class InnerClass
+    {
+        [Union<A, B>]
+        public partial class InnerUnion;
+    }
 }

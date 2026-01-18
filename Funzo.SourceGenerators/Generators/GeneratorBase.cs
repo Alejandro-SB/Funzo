@@ -2,10 +2,11 @@
 using Microsoft.CodeAnalysis;
 using System.Linq;
 
-namespace Funzo.SourceGenerators;
-internal abstract class SourceGeneratorBase
+namespace Funzo.SourceGenerators.Generators;
+
+internal abstract class GeneratorBase
 {
-    protected SourceGeneratorBase()
+    protected GeneratorBase()
     {
     }
 
@@ -16,5 +17,5 @@ internal abstract class SourceGeneratorBase
             DiagnosticSeverity.Error));
     }
 
-    internal abstract string? GetSource(SourceProductionContext context, SymbolWithAttribute symbolWithAttribute);
+    internal abstract string? GetSource(SourceProductionContext context, MarkedType type);
 }

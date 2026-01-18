@@ -66,7 +66,7 @@ public class ResultGeneratorTests
     [Fact]
     public void Generates_Nested_Results()
     {
-        InnerClass.InnerResult result = "test";
+        InnerClass.ReallyInnerClass.InnerResult result = "test";
 
         Assert.True(result.IsErr(out _));
     }
@@ -92,9 +92,11 @@ public partial class ClonedOk;
 [Result<ClonedOk, ClonedErr>]
 public partial class CheapClone;
 
-
 public static partial class InnerClass
 {
-    [Result<int, string>]
-    public partial class InnerResult;
+    public partial class ReallyInnerClass
+    {
+        [Result<int, string>]
+        public partial class InnerResult;
+    }
 }

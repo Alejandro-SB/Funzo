@@ -7,7 +7,7 @@ using System.Text;
 namespace Funzo.SourceGenerators.Generators.Results;
 internal class Result2AritySourceGenerator : ResultGenerator
 {
-    internal Result2AritySourceGenerator(SymbolWithAttribute symbolWithAttribute) : base(symbolWithAttribute)
+    internal Result2AritySourceGenerator(MarkedType symbolWithAttribute) : base(symbolWithAttribute)
     {
     }
 
