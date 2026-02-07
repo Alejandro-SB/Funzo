@@ -26,7 +26,17 @@ public abstract class {BaseClassName}
 {{
     internal abstract object GetValue();
 }}
-");
+
+/// <summary>
+/// Marker interface for union types
+/// </summary>
+public interface IUnion<T>
+{{
+    /// <summary>
+    /// Creates a new <typeparamref name=""TUnion"" /> that has at least the type <typeparamref name=""T"" /> as one of its options
+    /// </summary>
+    public static abstract TUnion From<TUnion>(T value) where TUnion : class, IUnion<T>;
+}}");
 
 for (var i = 2; i < 6; i++)
 {
@@ -43,7 +53,7 @@ static string GenerateClass(int ordinality)
 {
     var doc = @$"
 /// <summary>
-/// Class an entity that can be different types
+/// Class that represents an entity that can have different types
 /// </summary>
 {string.Join(Environment.NewLine, (Enumerable.Range(0, ordinality).Select(x => $@"/// <typeparam name=""T{x}""></typeparam>")))}";
 
@@ -122,17 +132,7 @@ public class {GenericClassName(ordinality)} : {BaseClassName}, IEquatable<{Gener
     }}
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {{
-        #if NETSTANDARD2_0
-        unchecked
-        {{
-            return (GetValue().GetHashCode() * 397) ^ _index;
-        }}
-#else
-        return HashCode.Combine(_index, GetValue().GetHashCode());
-#endif
-    }}
+    public override int GetHashCode() => HashCode.Combine(_index, GetValue().GetHashCode());
 }}
 ";
 }
@@ -228,6 +228,5 @@ public TOut Match<TOut>({arguments})
         {handlers}
         _ => throw new IndexOutOfRangeException(""Union went out of range"")
     }};
-}}
-";
+}}";
 }

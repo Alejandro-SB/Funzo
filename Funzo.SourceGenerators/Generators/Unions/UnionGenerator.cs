@@ -37,14 +37,19 @@ namespace {classSymbol.ContainingNamespace.ToDisplayString()}
             source.AppendLine($"{isStatic}partial class {containingType.Name} {{");
         }
 
-        source.AppendLine($@"         partial class {className} : global::{FunzoAttributeSources.AttributeNamespace}.Union{typeArguments.OpenGenericPart()}
+        source.AppendLine($@"         partial class {className} : global::{FunzoAttributeSources.AttributeNamespace}.Union{typeArguments.OpenGenericPart()}, {string.Join(",", typeArguments.Select(a => $"global::{FunzoAttributeSources.AttributeNamespace}.IUnion<{a.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>"))}
     {{");
 
         foreach (var typeArgument in typeArguments)
         {
+            var typeName = typeArgument.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             source.Append($@"
-        public {classSymbol.Name}({typeArgument.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} _) : base(_) {{}}
-        public static implicit operator {className}({typeArgument.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} _) => new {className}(_);
+        public static TUnion From<TUnion>({typeName} _) where TUnion: class, IUnion<{typeName}> => (new {className}(_) as TUnion)!;
+            ");
+
+            source.Append($@"
+        public {classSymbol.Name}({typeName} _) : base(_) {{}}
+        public static implicit operator {className}({typeName} _) => new {className}(_);
 ");
         }
 

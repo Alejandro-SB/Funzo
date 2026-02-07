@@ -14,9 +14,19 @@ public abstract class UnionBase
     internal abstract object GetValue();
 }
 
+/// <summary>
+/// Marker interface for union types
+/// </summary>
+public interface IUnion<T>
+{
+    /// <summary>
+    /// Creates a new <typeparamref name="TUnion" /> that has at least the type <typeparamref name="T" /> as one of its options
+    /// </summary>
+    public static abstract TUnion From<TUnion>(T value) where TUnion : class, IUnion<T>;
+}
 
 /// <summary>
-/// Class an entity that can be different types
+/// Class that represents an entity that can have different types
 /// </summary>
 /// <typeparam name="T0"></typeparam>
 /// <typeparam name="T1"></typeparam>
@@ -161,7 +171,6 @@ public TOut Match<TOut>(Func<T0, TOut> func0,Func<T1, TOut> func1)
     };
 }
 
-
     /// <inheritdoc />
     public bool Equals(Union<T0,T1>? other)
     {
@@ -181,23 +190,13 @@ public TOut Match<TOut>(Func<T0, TOut> func0,Func<T1, TOut> func1)
     }
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        #if NETSTANDARD2_0
-        unchecked
-        {
-            return (GetValue().GetHashCode() * 397) ^ _index;
-        }
-#else
-        return HashCode.Combine(_index, GetValue().GetHashCode());
-#endif
-    }
+    public override int GetHashCode() => HashCode.Combine(_index, GetValue().GetHashCode());
 }
 
 
 
 /// <summary>
-/// Class an entity that can be different types
+/// Class that represents an entity that can have different types
 /// </summary>
 /// <typeparam name="T0"></typeparam>
 /// <typeparam name="T1"></typeparam>
@@ -372,7 +371,6 @@ public TOut Match<TOut>(Func<T0, TOut> func0,Func<T1, TOut> func1,Func<T2, TOut>
     };
 }
 
-
     /// <inheritdoc />
     public bool Equals(Union<T0,T1,T2>? other)
     {
@@ -392,23 +390,13 @@ public TOut Match<TOut>(Func<T0, TOut> func0,Func<T1, TOut> func1,Func<T2, TOut>
     }
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        #if NETSTANDARD2_0
-        unchecked
-        {
-            return (GetValue().GetHashCode() * 397) ^ _index;
-        }
-#else
-        return HashCode.Combine(_index, GetValue().GetHashCode());
-#endif
-    }
+    public override int GetHashCode() => HashCode.Combine(_index, GetValue().GetHashCode());
 }
 
 
 
 /// <summary>
-/// Class an entity that can be different types
+/// Class that represents an entity that can have different types
 /// </summary>
 /// <typeparam name="T0"></typeparam>
 /// <typeparam name="T1"></typeparam>
@@ -613,7 +601,6 @@ public TOut Match<TOut>(Func<T0, TOut> func0,Func<T1, TOut> func1,Func<T2, TOut>
     };
 }
 
-
     /// <inheritdoc />
     public bool Equals(Union<T0,T1,T2,T3>? other)
     {
@@ -633,23 +620,13 @@ public TOut Match<TOut>(Func<T0, TOut> func0,Func<T1, TOut> func1,Func<T2, TOut>
     }
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        #if NETSTANDARD2_0
-        unchecked
-        {
-            return (GetValue().GetHashCode() * 397) ^ _index;
-        }
-#else
-        return HashCode.Combine(_index, GetValue().GetHashCode());
-#endif
-    }
+    public override int GetHashCode() => HashCode.Combine(_index, GetValue().GetHashCode());
 }
 
 
 
 /// <summary>
-/// Class an entity that can be different types
+/// Class that represents an entity that can have different types
 /// </summary>
 /// <typeparam name="T0"></typeparam>
 /// <typeparam name="T1"></typeparam>
@@ -884,7 +861,6 @@ public TOut Match<TOut>(Func<T0, TOut> func0,Func<T1, TOut> func1,Func<T2, TOut>
     };
 }
 
-
     /// <inheritdoc />
     public bool Equals(Union<T0,T1,T2,T3,T4>? other)
     {
@@ -904,16 +880,6 @@ public TOut Match<TOut>(Func<T0, TOut> func0,Func<T1, TOut> func1,Func<T2, TOut>
     }
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        #if NETSTANDARD2_0
-        unchecked
-        {
-            return (GetValue().GetHashCode() * 397) ^ _index;
-        }
-#else
-        return HashCode.Combine(_index, GetValue().GetHashCode());
-#endif
-    }
+    public override int GetHashCode() => HashCode.Combine(_index, GetValue().GetHashCode());
 }
 

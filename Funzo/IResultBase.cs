@@ -8,7 +8,6 @@
 /// <typeparam name="TErr">The type of the Error value</typeparam>
 public interface IResultBase<TResult, TOk, TErr>
 {
-#if NET6_0_OR_GREATER
     /// <summary>
     /// Creates an instance of <typeparamref name="TResult"/> in an Ok state
     /// </summary>
@@ -21,7 +20,6 @@ public interface IResultBase<TResult, TOk, TErr>
     /// <param name="err">The value of the operation</param>
     /// <returns>An instance of <typeparamref name="TResult"/></returns>
     public static abstract TResult Err(TErr err);
-#endif
 }
 
 /// <summary>
@@ -31,7 +29,6 @@ public interface IResultBase<TResult, TOk, TErr>
 /// <typeparam name="TErr">The type of the Error value</typeparam>
 public interface IResultBase<TResult, TErr>
 {
-#if NET6_0_OR_GREATER
     /// <summary>
     /// Creates an instance of <typeparamref name="TResult"/> in an Ok state
     /// </summary>
@@ -43,5 +40,4 @@ public interface IResultBase<TResult, TErr>
     /// <param name="err">The value of the operation</param>
     /// <returns>An instance of <typeparamref name="TResult"/></returns>
     public static abstract TResult Err(TErr err);
-#endif
 }
