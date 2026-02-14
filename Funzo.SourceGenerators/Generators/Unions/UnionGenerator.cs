@@ -43,6 +43,13 @@ internal class UnionGenerator : GeneratorBase
 
             foreach (var typeArgument in typeArguments)
             {
+                var typeName = typeArgument.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                builder.Implements($"global::Funzo.IUnion<{typeName}>")
+                    .WithMethod("TUnion", "From", m =>
+                                                    m.Static()
+                                                    .WithGeneric("TUnion", g => g.WithClassConstraint().WithTypeConstraint($"IUnion<{typeName}>"))
+                                                    .WithArguments([new(new(typeArgument), "_")])
+                                                    .WithBody($" => (new {type.Symbol.Name}(_) as TUnion)!;"));
                 builder.WithConstructor(c => c.WithBaseCall(["_"]).WithArguments([new(new(typeArgument), "_")]));
                 builder.WithImplicitConversionOperatorFrom(new(typeArgument), " => new(x);");
             }

@@ -51,6 +51,26 @@ public class UnionGeneratorTests
 
         u.Switch(a => { }, b => throw new InvalidOperationException());
     }
+
+    [Fact]
+    public void Returns_Generic_Item_By_Interface()
+    {
+        var testString = "TEST";
+        var first = GetUnion<TestUnion>(testString);
+        var second = GetUnion<AnotherTestUnion>(testString);
+
+        Assert.True(first.Is<string>(out var firstValue));
+        Assert.True(second.Is<string>(out var secondValue));
+
+        Assert.Equal(testString, firstValue);
+        Assert.Equal(testString, secondValue);
+    }
+
+    private TOut GetUnion<TOut>(string value)
+        where TOut : class, IUnion<string>
+    {
+        return TOut.From<TOut>(value);
+    }
 }
 
 
@@ -59,6 +79,9 @@ public partial class TestUnion;
 
 [Union<A, B, C>]
 public partial class CommonPropertyUnion;
+
+[Union<string, short>]
+public partial class AnotherTestUnion;
 
 public class A(string text)
 {

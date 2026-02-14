@@ -26,6 +26,18 @@ public abstract class {BaseClassName}
 {{
     internal abstract object GetValue();
 }}
+
+
+/// <summary>
+/// Marker interface for union types
+/// </summary>
+public interface IUnion<T>
+{{
+    /// <summary>
+    /// Creates a new <typeparamref name=""TUnion"" /> that has at least the type <typeparamref name=""T"" /> as one of its options
+    /// </summary>
+    public static abstract TUnion From<TUnion>(T value) where TUnion : class, IUnion<T>;
+}}
 ");
 
 for (var i = 2; i < 6; i++)
@@ -122,17 +134,7 @@ public class {GenericClassName(ordinality)} : {BaseClassName}, IEquatable<{Gener
     }}
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {{
-        #if NETSTANDARD2_0
-        unchecked
-        {{
-            return (GetValue().GetHashCode() * 397) ^ _index;
-        }}
-#else
-        return HashCode.Combine(_index, GetValue().GetHashCode());
-#endif
-    }}
+    public override int GetHashCode() => HashCode.Combine(_index, GetValue().GetHashCode());
 }}
 ";
 }

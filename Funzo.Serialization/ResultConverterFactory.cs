@@ -1,6 +1,4 @@
-﻿using System.CodeDom.Compiler;
-using System.Diagnostics;
-using System.Reflection;
+﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -76,8 +74,8 @@ public class ResultConverter<TResult, TOk, TErr> : JsonConverter<TResult>
         var deserializedValue = JsonSerializer.Deserialize<ResultRepresentation<TOk, TErr>>(ref reader, options) ?? throw new JsonException();
 
         return deserializedValue.IsOk
-            ? ResultConverter<TResult, TOk, TErr>.ProduceOk(deserializedValue.Ok!)
-            : ResultConverter<TResult, TOk, TErr>.ProduceErr(deserializedValue.Err!);
+            ? TResult.Ok(deserializedValue.Ok!)
+            : TResult.Err(deserializedValue.Err!);
     }
 
     /// <inheritdoc />
@@ -92,26 +90,6 @@ public class ResultConverter<TResult, TOk, TErr> : JsonConverter<TResult>
         var content = JsonSerializer.Serialize(representation, options);
 
         writer.WriteRawValue(content);
-    }
-
-    private static TResult ProduceErr(TErr err)
-    {
-#if NET6_0_OR_GREATER
-        return TResult.Err(err);
-#else
-        var staticErr = typeof(TResult).GetMethod("Err", BindingFlags.Static | BindingFlags.Public);
-        return (TResult)staticErr.Invoke(null, [err!]);
-#endif
-    }
-
-    private static TResult ProduceOk(TOk ok)
-    {
-#if NET6_0_OR_GREATER
-        return TResult.Ok(ok);
-#else
-        var staticOk = typeof(TResult).GetMethod("Ok", BindingFlags.Static | BindingFlags.Public);
-        return (TResult)staticOk.Invoke(null, [ok!]);
-#endif
     }
 }
 
@@ -134,8 +112,8 @@ public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
         var deserializedValue = JsonSerializer.Deserialize<ResultRepresentation<string, TErr>>(ref reader, options) ?? throw new JsonException();
 
         return deserializedValue.IsOk
-            ? ResultConverter<TResult, TErr>.ProduceOk()
-            : ResultConverter<TResult, TErr>.ProduceErr(deserializedValue.Err!);
+            ? TResult.Ok()
+            : TResult.Err(deserializedValue.Err!);
     }
 
     /// <inheritdoc />
@@ -150,25 +128,5 @@ public class ResultConverter<TResult, TErr> : JsonConverter<TResult>
         var content = JsonSerializer.Serialize(representation, options);
 
         writer.WriteRawValue(content);
-    }
-
-    private static TResult ProduceErr(TErr err)
-    {
-#if NET6_0_OR_GREATER
-        return TResult.Err(err);
-#else
-        var staticErr = typeof(TResult).GetMethod("Err", BindingFlags.Static | BindingFlags.Public);
-        return (TResult)staticErr.Invoke(null, [err!]);
-#endif
-    }
-
-    private static TResult ProduceOk()
-    {
-#if NET6_0_OR_GREATER
-        return TResult.Ok();
-#else
-        var staticOk = typeof(TResult).GetMethod("Ok", BindingFlags.Static | BindingFlags.Public);
-        return (TResult)staticOk.Invoke(null, []);
-#endif
     }
 }
