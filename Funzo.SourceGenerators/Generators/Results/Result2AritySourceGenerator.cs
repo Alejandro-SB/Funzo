@@ -1,55 +1,52 @@
 ﻿using Funzo.SourceGenerators.Helpers;
 using Microsoft.CodeAnalysis;
+using Sorse;
+using Sorse.BuilderInterfaces;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 
 namespace Funzo.SourceGenerators.Generators.Results;
+
 internal class Result2AritySourceGenerator : ResultGenerator
 {
     internal Result2AritySourceGenerator(MarkedType symbolWithAttribute) : base(symbolWithAttribute)
     {
     }
 
-    internal override string ClassDefinition => $@"partial class {ClassName} : global::Funzo.ResultBase<{ClassName}, {OkDisplayName},{ErrDisplayName}>, global::Funzo.IResultBase<{ClassName}, {OkDisplayName},{ErrDisplayName}>";
-
-    internal override string OkConstructor => @$"protected {ClassName}({OkDisplayName} _) : base(_) {{}}";
-
-    internal override string ErrConstructor => $@"protected {ClassName}({ErrDisplayName} _) : base(_) {{}}";
-
-    internal override string OkStaticHelper => $@"public static {ClassName} Ok({OkDisplayName} ok) => new(ok);";
-
-    internal override string ErrStaticHelper => $@"public static {ClassName} Err({ErrDisplayName} err) => new(err);";
-
-    internal override string OkImplicitConverter
+    protected override void GenerateResultInner(IClassBuilder builder)
     {
-        get
-        {
-            var implicitConversions = new StringBuilder();
-            implicitConversions.AppendLine($@"public static implicit operator {ClassName}({OkDisplayName} _) => new {ClassName}(_);");
+        builder.Inherits($"global::Funzo.ResultBase<{ClassName}, {OkDisplayName}, {ErrDisplayName}>")
+            .Implements($"global::Funzo.IResultBase<{ClassName}, {OkDisplayName}, {ErrDisplayName}>")
+            .WithConstructor(c => c.WithAccessModifier(AccessModifier.Protected)
+                                    .WithArguments([new(new(OkType), "_")]).WithBaseCall(["_"]))
+            .WithConstructor(c => c.WithAccessModifier(AccessModifier.Protected)
+                                    .WithArguments([new(new(ErrType), "_")]).WithBaseCall(["_"]))
+            .WithMethod(ClassName, "Ok", m => m.Static().WithArguments([new(new(OkType), "ok")]).WithBody(" => new(ok);"))
+            .WithMethod(ClassName, "Err", m => m.Static().WithArguments([new(new(ErrType), "err")]).WithBody(" => new(err);"))
+            .WithImplicitConversionOperatorFrom(new(OkType), " => new(x);")
+            .WithImplicitConversionOperatorFrom(new(ErrType), " => new(x);");
 
-            if (!HasCollidingParameters() && TryGetImplicitConvertersForUnionType(OkType, ResultParameterType.Ok, out var converters))
-            {
-                implicitConversions.AppendLine(converters);
-            }
-
-            return implicitConversions.ToString();
-        }
+        AddConversionsForUnions(builder);
     }
 
-    internal override string ErrImplicitConverter
+    private void AddConversionsForUnions(IClassBuilder builder)
     {
-        get
+        if (HasCollidingParameters())
         {
-            var implicitConversions = new StringBuilder();
-            implicitConversions.AppendLine($@"public static implicit operator {ClassName}({ErrDisplayName} _) => new {ClassName}(_);");
+            return;
+        }
 
-            if (!HasCollidingParameters() && TryGetImplicitConvertersForUnionType(ErrType, ResultParameterType.Err, out var converters))
-            {
-                implicitConversions.AppendLine(converters);
-            }
+        var okUnions = GetTypesNeedingImplicitConversions(OkType, ResultParameterType.Ok);
+        var errUnions = GetTypesNeedingImplicitConversions(ErrType, ResultParameterType.Err);
 
-            return implicitConversions.ToString();
+        foreach (var ok in okUnions)
+        {
+            builder.WithImplicitConversionOperatorFrom(new(ok), " => new(x);");
+        }
+
+        foreach (var err in errUnions)
+        {
+            builder.WithImplicitConversionOperatorFrom(new(err), " => new(x);");
         }
     }
 
