@@ -27,18 +27,7 @@ internal class UnionGenerator : GeneratorBase
 
         var sorse = WithSorse.CreateNamespaceScope(classSymbol.ContainingNamespace.ToDisplayString(), []);
 
-        // TODO: Needs some rework. Feels off
-        if (!type.ContainerClasses.Any())
-        {
-            sorse.AddClass(className, AddUnionClass(type));
-        }
-        else
-        {
-            var builder = GetClassBuilderFromContainingClasses(type, sorse);
-
-            // Add the main partial class
-            builder.WithInnerClass(className, AddUnionClass(type));
-        }
+        sorse.AddClassWithInnerClasses(type, AddUnionClass(type));
 
         var src = sorse.GetSource();
 
@@ -65,43 +54,6 @@ internal class UnionGenerator : GeneratorBase
                 builder.WithProperty(new(prop.Type), prop.Name, p => p.WithComputedValue($" => Match({string.Join(",", Enumerable.Range(0, typeArguments.Length).Select(_ => $"x => x.{prop.Name}"))});"));
             }
         };
-
-    private IClassBuilder GetClassBuilderFromContainingClasses(MarkedType type, INamespaceScope sorse)
-    {
-        // Create the first class in the namespace
-        var container = type.ContainerClasses.Pop();
-
-        IClassBuilder builder = null!;
-
-        sorse.AddClass(container.Name, b =>
-        {
-            builder = b;
-            AddContainer(b, container);
-        });
-
-        // Nest the rest
-        foreach (var c in type.ContainerClasses)
-        {
-            builder.WithInnerClass(c.Name, b =>
-            {
-                builder = b;
-                AddContainer(b, c);
-            });
-
-        }
-
-        return builder;
-
-        static void AddContainer(IClassBuilder builder, ContainerClass c)
-        {
-            builder.Partial();
-
-            if (c.IsStatic)
-            {
-                builder.Static();
-            }
-        }
-    }
 
     private bool HasErrors(SourceProductionContext context, MarkedType type)
     {

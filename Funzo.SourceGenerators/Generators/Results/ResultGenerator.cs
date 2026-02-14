@@ -1,8 +1,8 @@
 ﻿using Funzo.SourceGenerators.Helpers;
 using Microsoft.CodeAnalysis;
+using Sorse.BuilderInterfaces;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Text;
 
 namespace Funzo.SourceGenerators.Generators.Results;
 
@@ -17,14 +17,14 @@ internal abstract class ResultGenerator
         _symbolWithAttribute = symbolWithAttribute;
     }
 
-    internal abstract string ClassDefinition { get; }
-    internal abstract string OkConstructor { get; }
-    internal abstract string ErrConstructor { get; }
-    internal abstract string OkStaticHelper { get; }
-    internal abstract string ErrStaticHelper { get; }
-    internal abstract string OkImplicitConverter { get; }
-    internal abstract string ErrImplicitConverter { get; }
+    internal void GenerateResult(IClassBuilder builder)
+    {
+        builder.Partial();
 
+        GenerateResultInner(builder);
+    }
+
+    protected abstract void GenerateResultInner(IClassBuilder builder);
     protected string ClassName => $"{ClassSymbol.Name}";
 
     protected bool TryGetUnionTypes(ITypeSymbol type, out IEnumerable<ITypeSymbol> types)
@@ -43,24 +43,13 @@ internal abstract class ResultGenerator
         }
     }
 
-    protected bool TryGetImplicitConvertersForUnionType(ITypeSymbol type, ResultParameterType parameterType, out string converters)
+    protected IEnumerable<ITypeSymbol> GetTypesNeedingImplicitConversions(ITypeSymbol type, ResultParameterType parameterType)
     {
         if (!TryGetUnionTypes(type, out var unionTypes))
         {
-            converters = string.Empty;
-            return false;
+            return [];
         }
 
-        var sb = new StringBuilder();
-
-        var ctor = parameterType is ResultParameterType.Ok ? "Ok" : "Err";
-
-        foreach (var unionType in unionTypes)
-        {
-            sb.AppendLine($@"public static implicit operator {ClassName}({unionType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} _) => {ctor}(_);");
-        }
-
-        converters = sb.ToString();
-        return true;
+        return unionTypes;
     }
 }
