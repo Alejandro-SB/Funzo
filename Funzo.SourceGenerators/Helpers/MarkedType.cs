@@ -26,7 +26,7 @@ internal class MarkedType
 
         while (container is not null)
         {
-            containers.Push(new(container.Name));
+            containers.Push(new(container.Name, container.IsStatic));
             container = container.ContainingType;
         }
 
