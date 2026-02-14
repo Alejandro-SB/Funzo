@@ -6,10 +6,10 @@
     <File Path="LICENSE" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="Funzo.Generator/Funzo.Generator.csproj" />
-  <Project Path="Funzo.Serialization/Funzo.Serialization.csproj" />
-  <Project Path="Funzo.SourceGenerators.Test/Funzo.SourceGenerators.Test.csproj" />
-  <Project Path="Funzo.SourceGenerators/Funzo.SourceGenerators.csproj" />
-  <Project Path="Funzo.Test/Funzo.Test.csproj" />
-  <Project Path="Funzo/Funzo.csproj" />
+  <Project Path="src/Funzo.Generator/Funzo.Generator.csproj" />
+  <Project Path="src/Funzo.Serialization/Funzo.Serialization.csproj" />
+  <Project Path="test/Funzo.SourceGenerators.Test/Funzo.SourceGenerators.Test.csproj" />
+  <Project Path="src/Funzo.SourceGenerators/Funzo.SourceGenerators.csproj" />
+  <Project Path="test/Funzo.Test/Funzo.Test.csproj" />
+  <Project Path="src/Funzo/Funzo.csproj" />
 </Solution>

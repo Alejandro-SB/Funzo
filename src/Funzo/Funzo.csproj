@@ -6,9 +6,9 @@
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<Title>Funzo.Serialization</Title>
+		<Title>Funzo</Title>
 		<Authors>Alejandro-SB</Authors>
-		<Description>Contains serialization helpers for Result, Option and Union types</Description>
+		<Description>Contains Result, Option and Union types to use in C#</Description>
 		<PackageProjectUrl>https://github.com/Alejandro-SB/Funzo</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Alejandro-SB/Funzo</RepositoryUrl>
@@ -20,22 +20,18 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\LICENSE">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-		<None Include="..\README.md">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
+	  <None Include="..\..\LICENSE">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="System.Text.Json" Version="10.0.1" />
-	</ItemGroup>
-	
 	<ItemGroup>
-	  <ProjectReference Include="..\Funzo\Funzo.csproj" />
+		<InternalsVisibleTo Include="Funzo.Serialization" />
 	</ItemGroup>
 
 </Project>

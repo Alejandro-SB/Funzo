@@ -22,9 +22,9 @@
 		<PackageReference Include="xunit.v3" Version="3.2.2" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Funzo.SourceGenerators\Funzo.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-		<ProjectReference Include="..\Funzo.Serialization\Funzo.Serialization.csproj" />
-		<ProjectReference Include="..\Funzo\Funzo.csproj" />
+		<ProjectReference Include="..\..\src\Funzo.SourceGenerators\Funzo.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\src\Funzo.Serialization\Funzo.Serialization.csproj" />
+		<ProjectReference Include="..\..\src\Funzo\Funzo.csproj" />
 	</ItemGroup>
 
 </Project>
