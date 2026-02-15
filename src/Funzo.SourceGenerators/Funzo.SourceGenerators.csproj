@@ -22,21 +22,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>		
-		<PackageReference Include="Sorse" Version="0.3.3-beta" PrivateAssets="all" GeneratePathProperty="true" />
+		<PackageReference Include="Sorse" Version="0.5.0" PrivateAssets="all" GeneratePathProperty="true" />
+		<TargetPathWithTargetPlatformMoniker Include="$(PKGSorse)\lib\netstandard2.0\Sorse.dll" IncludeRuntimeDependency="false" />
+
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<None Include="$(PkgSorse)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
-
-	<PropertyGroup>
-		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
-	</PropertyGroup>
-
-	<Target Name="GetDependencyTargetPaths">
-		<ItemGroup>
-			<TargetPathWithTargetPlatformMoniker Include="$(PKGSorse)\lib\netstandard2.0\Sorse.dll" IncludeRuntimeDependency="false" />
-			<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-			<None Include="$(PkgSorse)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-		</ItemGroup>
-		<Message Text="$(PkgSorse)" Importance="high" />
-	</Target>
 	
 	<ItemGroup>
 		<None Include="..\..\LICENSE">

@@ -18,13 +18,13 @@ internal class Result2AritySourceGenerator : ResultGenerator
         builder.Inherits($"global::Funzo.ResultBase<{ClassName}, {OkDisplayName}, {ErrDisplayName}>")
             .Implements($"global::Funzo.IResultBase<{ClassName}, {OkDisplayName}, {ErrDisplayName}>")
             .WithConstructor(c => c.WithAccessModifier(AccessModifier.Protected)
-                                    .WithArguments([new(new(OkType), "_")]).WithBaseCall(["_"]))
+                                    .WithArguments([new(OkType, "_")]).WithBaseCall(["_"]))
             .WithConstructor(c => c.WithAccessModifier(AccessModifier.Protected)
-                                    .WithArguments([new(new(ErrType), "_")]).WithBaseCall(["_"]))
-            .WithMethod(ClassName, "Ok", m => m.Static().WithArguments([new(new(OkType), "ok")]).WithBody(" => new(ok);"))
-            .WithMethod(ClassName, "Err", m => m.Static().WithArguments([new(new(ErrType), "err")]).WithBody(" => new(err);"))
-            .WithImplicitConversionOperatorFrom(new(OkType), " => new(x);")
-            .WithImplicitConversionOperatorFrom(new(ErrType), " => new(x);");
+                                    .WithArguments([new(ErrType, "_")]).WithBaseCall(["_"]))
+            .WithMethod(ClassName, "Ok", m => m.Static().WithArguments([new(OkType, "ok")]).WithBody(" => new(ok);"))
+            .WithMethod(ClassName, "Err", m => m.Static().WithArguments([new(ErrType, "err")]).WithBody(" => new(err);"))
+            .WithImplicitConversionOperatorFrom(OkType, " => new(x);")
+            .WithImplicitConversionOperatorFrom(ErrType, " => new(x);");
 
         AddConversionsForUnions(builder);
     }
@@ -41,12 +41,12 @@ internal class Result2AritySourceGenerator : ResultGenerator
 
         foreach (var ok in okUnions)
         {
-            builder.WithImplicitConversionOperatorFrom(new(ok), " => new(x);");
+            builder.WithImplicitConversionOperatorFrom(ok, " => new(x);");
         }
 
         foreach (var err in errUnions)
         {
-            builder.WithImplicitConversionOperatorFrom(new(err), " => new(x);");
+            builder.WithImplicitConversionOperatorFrom(err, " => new(x);");
         }
     }
 

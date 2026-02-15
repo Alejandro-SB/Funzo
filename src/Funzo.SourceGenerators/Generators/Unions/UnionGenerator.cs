@@ -25,7 +25,7 @@ internal class UnionGenerator : GeneratorBase
         var className = $"{classSymbol.Name}";
         var typeArguments = type.AttributeTypeArguments;
 
-        var sorse = WithSorse.CreateNamespaceScope(classSymbol.ContainingNamespace.ToDisplayString(), []);
+        var sorse = WithSorse.CreateNamespace(classSymbol.ContainingNamespace.ToDisplayString(), []);
 
         sorse.AddClassWithInnerClasses(type, AddUnionClass(type));
 
@@ -48,17 +48,17 @@ internal class UnionGenerator : GeneratorBase
                     .WithMethod("TUnion", "From", m =>
                                                     m.Static()
                                                     .WithGeneric("TUnion", g => g.WithClassConstraint().WithTypeConstraint($"IUnion<{typeName}>"))
-                                                    .WithArguments([new(new(typeArgument), "_")])
+                                                    .WithArguments([new(typeArgument, "_")])
                                                     .WithBody($" => (new {type.Symbol.Name}(_) as TUnion)!;"));
-                builder.WithConstructor(c => c.WithBaseCall(["_"]).WithArguments([new(new(typeArgument), "_")]));
-                builder.WithImplicitConversionOperatorFrom(new(typeArgument), " => new(x);");
+                builder.WithConstructor(c => c.WithBaseCall(["_"]).WithArguments([new(typeArgument, "_")]));
+                builder.WithImplicitConversionOperatorFrom(typeArgument, " => new(x);");
             }
 
             var commonProperties = GetCommonProperties(type.AttributeTypeArguments);
 
             foreach (var prop in commonProperties)
             {
-                builder.WithProperty(new(prop.Type), prop.Name, p => p.WithComputedValue($" => Match({string.Join(",", Enumerable.Range(0, typeArguments.Length).Select(_ => $"x => x.{prop.Name}"))});"));
+                builder.WithProperty(prop.Type, prop.Name, p => p.WithComputedValue($" => Match({string.Join(",", Enumerable.Range(0, typeArguments.Length).Select(_ => $"x => x.{prop.Name}"))});"));
             }
         };
 

@@ -25,7 +25,7 @@ internal class ResultSourceGenerator : GeneratorBase
             ? new Result1AritySourceGenerator(type)
             : new Result2AritySourceGenerator(type);
 
-        var sorse = WithSorse.CreateNamespaceScope(type.Symbol.ContainingNamespace.ToDisplayString(), []);
+        var sorse = WithSorse.CreateNamespace(type.Symbol.ContainingNamespace.ToDisplayString());
 
         sorse.AddClassWithInnerClasses(type, generator.GenerateResult);
 

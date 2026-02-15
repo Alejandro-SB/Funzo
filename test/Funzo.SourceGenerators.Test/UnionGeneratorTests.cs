@@ -66,7 +66,7 @@ public class UnionGeneratorTests
         Assert.Equal(testString, secondValue);
     }
 
-    private TOut GetUnion<TOut>(string value)
+    private static TOut GetUnion<TOut>(string value)
         where TOut : class, IUnion<string>
     {
         return TOut.From<TOut>(value);

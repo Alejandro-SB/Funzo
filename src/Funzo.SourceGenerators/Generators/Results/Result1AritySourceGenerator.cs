@@ -15,10 +15,10 @@ internal class Result1AritySourceGenerator : ResultGenerator
         builder.Inherits($"global::Funzo.ResultBase<{ClassName}, {ErrDisplayName}>")
             .Implements($"global::Funzo.IResultBase<{ClassName}, {ErrDisplayName}>")
             .WithConstructor(c => c.WithBaseCall([]))
-            .WithConstructor(c => c.WithArguments([new(new(ErrType), "x")]).WithBaseCall(["x"]))
+            .WithConstructor(c => c.WithArguments([new(ErrType, "x")]).WithBaseCall(["x"]))
             .WithMethod(ClassName, "Ok", m => m.Static().WithBody(" => new();"))
-            .WithMethod(ClassName, "Err", m => m.Static().WithArguments([new(new(ErrType), "x")]).WithBody(" => new(x);"))
-            .WithImplicitConversionOperatorFrom(new(ErrType), " => new(x);");
+            .WithMethod(ClassName, "Err", m => m.Static().WithArguments([new(ErrType, "x")]).WithBody(" => new(x);"))
+            .WithImplicitConversionOperatorFrom(ErrType, " => new(x);");
 
         AddConversionsForErrUnions(builder);
     }
@@ -27,7 +27,7 @@ internal class Result1AritySourceGenerator : ResultGenerator
     {
         foreach (var type in GetTypesNeedingImplicitConversions(ErrType, ResultParameterType.Err))
         {
-            builder.WithImplicitConversionOperatorFrom(new(type), $" => new(x);");
+            builder.WithImplicitConversionOperatorFrom(type, $" => new(x);");
         }
     }
 
