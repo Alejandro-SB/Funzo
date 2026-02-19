@@ -36,8 +36,8 @@ internal class Result2AritySourceGenerator : ResultGenerator
             return;
         }
 
-        var okUnions = GetTypesNeedingImplicitConversions(OkType, ResultParameterType.Ok);
-        var errUnions = GetTypesNeedingImplicitConversions(ErrType, ResultParameterType.Err);
+        var okUnions = GetTypesNeedingImplicitConversions(OkType);
+        var errUnions = GetTypesNeedingImplicitConversions(ErrType);
 
         foreach (var ok in okUnions)
         {

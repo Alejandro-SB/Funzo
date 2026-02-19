@@ -43,7 +43,7 @@ internal abstract class ResultGenerator
         }
     }
 
-    protected IEnumerable<ITypeSymbol> GetTypesNeedingImplicitConversions(ITypeSymbol type, ResultParameterType parameterType)
+    protected IEnumerable<ITypeSymbol> GetTypesNeedingImplicitConversions(ITypeSymbol type)
     {
         if (!TryGetUnionTypes(type, out var unionTypes))
         {

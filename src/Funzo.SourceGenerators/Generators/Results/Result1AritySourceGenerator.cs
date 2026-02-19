@@ -25,7 +25,7 @@ internal class Result1AritySourceGenerator : ResultGenerator
 
     private void AddConversionsForErrUnions(IClassBuilder builder)
     {
-        foreach (var type in GetTypesNeedingImplicitConversions(ErrType, ResultParameterType.Err))
+        foreach (var type in GetTypesNeedingImplicitConversions(ErrType))
         {
             builder.WithImplicitConversionOperatorFrom(type, $" => new(x);");
         }

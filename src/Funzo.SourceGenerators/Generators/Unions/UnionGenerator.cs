@@ -47,7 +47,7 @@ internal class UnionGenerator : GeneratorBase
                 builder.Implements($"global::Funzo.IUnion<{typeName}>")
                     .WithMethod("TUnion", "From", m =>
                                                     m.Static()
-                                                    .WithGeneric("TUnion", g => g.WithClassConstraint().WithTypeConstraint($"IUnion<{typeName}>"))
+                                                    .WithGeneric("TUnion", g => g.WithClassConstraint().WithTypeConstraint($"global::Funzo.IUnion<{typeName}>"))
                                                     .WithArguments([new(typeArgument, "_")])
                                                     .WithBody($" => (new {type.Symbol.Name}(_) as TUnion)!;"));
                 builder.WithConstructor(c => c.WithBaseCall(["_"]).WithArguments([new(typeArgument, "_")]));
